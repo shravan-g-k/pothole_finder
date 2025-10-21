@@ -9,7 +9,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final page = ValueNotifier<BottomBarButtonEnum>(BottomBarButtonEnum.home);
+    final page = ValueNotifier<BottomBarButtonEnum>(BottomBarButtonEnum.maps);
     return Scaffold(
       body: ValueListenableBuilder(
         valueListenable: page,
@@ -24,33 +24,51 @@ class Home extends StatelessWidget {
           }
         },
       ),
-      bottomNavigationBar: ValueListenableBuilder(
-        valueListenable: page,
-        builder: (context, value, child) {
-          return NavigationBar(
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.home),
-                label: 'Home',
-                selectedIcon: const Icon(Icons.home),
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.map),
-                label: 'Maps',
-                selectedIcon: const Icon(Icons.map),
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.person),
-                label: 'Profile',
-                selectedIcon: const Icon(Icons.person),
-              ),
-            ],
-            selectedIndex: page.value.index,
-            onDestinationSelected: (index) {
-              page.value = BottomBarButtonEnum.values[index];
-            },
-          );
-        },
+      extendBody: true,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withAlpha(100),
+              spreadRadius: 2,
+              blurRadius: 3,
+              offset: const Offset(0, 0),
+            ),
+          ],
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        margin: const EdgeInsets.all(16),
+        child: ValueListenableBuilder(
+          valueListenable: page,
+          builder: (context, value, child) {
+            return NavigationBar(
+              backgroundColor: Colors.transparent,
+              destinations: [
+                NavigationDestination(
+                  icon: const Icon(Icons.home),
+                  label: 'Home',
+                  selectedIcon: const Icon(Icons.home),
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.map),
+                  label: 'Maps',
+                  selectedIcon: const Icon(Icons.map),
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.person),
+                  label: 'Profile',
+                  selectedIcon: const Icon(Icons.person),
+                ),
+              ],
+              selectedIndex: page.value.index,
+              onDestinationSelected: (index) {
+                page.value = BottomBarButtonEnum.values[index];
+              },
+            );
+          },
+        ),
       ),
     );
   }
