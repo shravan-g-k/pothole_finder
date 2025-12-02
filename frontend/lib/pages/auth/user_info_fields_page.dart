@@ -23,7 +23,6 @@ class _UserInfoFieldsPageState extends State<UserInfoFieldsPage> {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text.trim();
       context.read<AuthBloc>().add(BasicInfoFormSubmitted(name: name, phone: "", password: ""));
-      print('Signing in with name: $name');
     }
   }
 

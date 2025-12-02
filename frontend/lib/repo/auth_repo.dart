@@ -31,4 +31,12 @@ class AuthRepo {
       accessToken: authorization.accessToken,
     );
   }
+
+  Future<void> signOut() async {
+    await supabaseAuth.signOut();
+  }
+
+   Stream<User?> authStateChanges() {
+    return supabaseAuth.onAuthStateChange.map((data) => data.session?.user);  
+  }
 }

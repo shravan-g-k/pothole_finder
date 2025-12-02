@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/auth/auth_bloc.dart';
+// ignore: unused_import
 import 'package:frontend/pages/auth/user_info_fields_page.dart';
 import 'package:frontend/pages/wrapper.dart';
 import 'package:frontend/repo/auth_repo.dart';
@@ -34,16 +35,14 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthRepo(InstanceProviders.supabaseClient.auth),
         ),
       ],
-      child: MaterialApp(
-        title: 'Pothole Finder',
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (context) => AuthBloc(context.read<AuthRepo>()),
-            ),
-          ],
-          child: AuthWrapper(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AuthBloc(context.read<AuthRepo>())),
+        ],
+        child: MaterialApp(
+          title: 'Pothole Finder',
+          theme: ThemeData(primarySwatch: Colors.blue),
+          home: const AuthWrapper(),
         ),
       ),
     );
