@@ -7,20 +7,16 @@ import 'package:frontend/pages/wrapper.dart';
 import 'package:frontend/repo/auth_repo.dart';
 import 'package:frontend/utils/helpers/instance_providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await dotenv.load(fileName: "lib/.env");
+  await dotenv.load(fileName: ".env");
 
-  // final supabaseUrl = dotenv.env['SUPABASE_URL']!;
-  // final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY']!;
+  final supabaseUrl = dotenv.env['SUPABASE_URL']!;
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY']!;
 
-  await Supabase.initialize(
-    url: "https://rpwdsjjhgiicqvrzojog.supabase.co",
-    anonKey:
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwd2RzampoZ2lpY3F2cnpvam9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ1MTM0NTQsImV4cCI6MjA4MDA4OTQ1NH0.juADVYShWJQnRPcZNJ_Z7bSDxEcGV8HBx7ERT0jLUgw",
-  );
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
   runApp(const MyApp());
 }
 

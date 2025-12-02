@@ -1,5 +1,6 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthRepo {
   final GoTrueClient supabaseAuth;
@@ -7,7 +8,7 @@ class AuthRepo {
   AuthRepo(this.supabaseAuth);
 
   Future<void> signInWithGoogle() async {
-    const webClientId = '573519985252-c39qr1om3tjst8dtm15a3ie6ge078eil.apps.googleusercontent.com';
+    final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID']!;
     final scopes = ['email', 'profile'];
     final googleSignIn = GoogleSignIn.instance;
     await googleSignIn.initialize(serverClientId: webClientId);
@@ -36,7 +37,7 @@ class AuthRepo {
     await supabaseAuth.signOut();
   }
 
-   Stream<User?> authStateChanges() {
-    return supabaseAuth.onAuthStateChange.map((data) => data.session?.user);  
+  Stream<User?> authStateChanges() {
+    return supabaseAuth.onAuthStateChange.map((data) => data.session?.user);
   }
 }
