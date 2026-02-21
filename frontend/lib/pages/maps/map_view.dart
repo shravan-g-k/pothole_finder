@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:frontend/pages/maps/search_bar.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapView extends StatelessWidget {
@@ -16,15 +17,6 @@ class MapView extends StatelessWidget {
       // North-East Corner (Max Latitude, Max Longitude)
       LatLng(35.67, 97.40),
     );
-
-    // final LatLngBounds karnatakaBounds = LatLngBounds(
-    //   // South-West Corner (Min Lat, Min Long)
-    //   LatLng(11.48, 73.64),
-    //
-    //   // North-East Corner (Max Lat, Max Long)
-    //   LatLng(18.53, 78.62),
-    // );
-
     return FlutterMap(
       options: MapOptions(
         interactionOptions: const InteractionOptions(
@@ -39,23 +31,11 @@ class MapView extends StatelessWidget {
         crs: Epsg3857(),
       ),
       children: [
+       
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName:
               'com.example.pothole_finder', //comes under legal constraints to be followed
-        ),
-
-        CircleLayer(
-          circles: [
-            CircleMarker(
-              point: karnatakaCenter,
-              radius: 400000, // in meters (50 km)
-              useRadiusInMeter: true,
-              color: Color.fromRGBO(127, 166, 162, 0.2901960784313726),
-              borderColor: Colors.red,
-              borderStrokeWidth: 2,
-            ),
-          ],
         ),
       ],
     );
