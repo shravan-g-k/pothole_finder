@@ -1,3 +1,4 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
 part of 'auth_bloc.dart';
 
 @immutable
