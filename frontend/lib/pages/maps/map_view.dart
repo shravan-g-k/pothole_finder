@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:trip_routing/trip_routing.dart';
-
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -15,194 +11,17 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late TextEditingController fromController;
-  late TextEditingController toController;
+  GoogleMapController? _mapController;
+  MapType _currentMapType = MapType.normal;
 
-  LatLng? fromLocation;    // Your location (typed OR GPS)
-  LatLng? toLocation;      // Destination (typed)
-
-  final LatLng karnatakaCenter = const LatLng(15.3173, 75.7139);
-
-  @override
-  void initState() {
-    super.initState();
-    fromController = TextEditingController();
-    toController = TextEditingController();
-
-    // Update when user stops typing (0.6 sec)
-    fromController.addListener(() {
-      _updateLocationFromText(fromController.text, true);
-    });
-
-    toController.addListener(() {
-      _updateLocationFromText(toController.text, false);
-    });
-  }
+  static const LatLng _karnatakaCenter = LatLng(15.3173, 75.7139);
 
   @override
   void dispose() {
-    fromController.dispose();
-    toController.dispose();
+    _mapController?.dispose();
     super.dispose();
   }
 
-  bool _isValidLatLng(LatLng? p) {
-    if (p == null) return false;
-    return p.latitude.isFinite && p.longitude.isFinite;
-  }
-
-  // ---------------------------
-  // UPDATE LOCATION FROM TYPING
-  // ---------------------------
-  Future<void> _updateLocationFromText(String text, bool isFromField) async {
-    if (text.trim().isEmpty) return;
-
-    try {
-      final results = await locationFromAddress(text);
-      if (results.isEmpty) return;
-
-      final LatLng coords =
-      LatLng(results.first.latitude, results.first.longitude);
-
-      setState(() {
-        if (isFromField) {
-          fromLocation = coords;
-        } else {
-          toLocation = coords;
-        }
-      });
-    } catch (_) {
-      // ignore incorrect names
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final LatLng safeFrom = _isValidLatLng(fromLocation) ? fromLocation! : karnatakaCenter;
-    final LatLng safeTo = _isValidLatLng(toLocation)
-        ? toLocation!
-        : LatLng(karnatakaCenter.latitude + 1, karnatakaCenter.longitude + 1);
-
-    final bool hasRoute =
-        _isValidLatLng(fromLocation) && _isValidLatLng(toLocation);
-
-    return Stack(
-      children: [
-        FlutterMap(
-          options: MapOptions(
-            initialCenter: karnatakaCenter,
-            initialZoom: 7,
-            maxZoom: 19,
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.example.pothole_finder',
-            ),
-
-            // MARKERS
-            MarkerLayer(
-              markers: [
-                // FROM MARKER
-                Marker(
-                  point: safeFrom,
-                  width: 80,
-                  height: 80,
-                  child: const Icon(Icons.electric_scooter_rounded,
-                      size: 40, color: Colors.blue),
-                ),
-
-                // TO MARKER
-                if (_isValidLatLng(toLocation))
-                  Marker(
-                    point: safeTo,
-                    width: 80,
-                    height: 80,
-                    child: const Icon(Icons.location_on_outlined,
-                        size: 40, color: Colors.red),
-                  ),
-              ],
-            ),
-
-            // POLYLINE BETWEEN FROM & TO
-            if (hasRoute)
-              PolylineLayer(
-                polylines: [
-                  Polyline(
-                    points: [safeFrom, safeTo],
-                    color: Colors.blue,
-                    strokeWidth: 4,
-                  ),
-                ],
-              ),
-          ],
-        ),
-
-        // TEXTFIELDS + BUTTON
-        Positioned(
-          top: 40,
-          left: 20,
-          right: 20,
-          child: Column(
-            children: [
-              // FROM FIELD
-              SizedBox(
-                height: 50,
-                child: TextField(
-                  controller: fromController,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.electric_scooter_rounded),
-                    hintText: "Your location (type or use GPS)",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(15)),
-                    ),
-                  ),
-                ),
-              ),
-
-              // TO FIELD
-              SizedBox(
-                height: 50,
-                child: TextField(
-                  controller: toController,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.location_on_outlined),
-                    hintText: "Destination (type address)",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(15)),
-                    ),
-                  ),
-                ),
-              ),
-
-              // GPS BUTTON
-              Padding(
-                padding: const EdgeInsets.fromLTRB(200, 550, 20, 35),
-                child: ElevatedButton(
-                  onPressed: _setCurrentLocation,
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(16),
-                  ),
-                  child: const Icon(CupertinoIcons.compass, size: 20),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ---------------------------
-  // GPS + REVERSE GEOCODING
-  // ---------------------------
   Future<void> _setCurrentLocation() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
@@ -211,32 +30,84 @@ class _MapPageState extends State<MapPage> {
           permission == LocationPermission.deniedForever) {
         permission = await Geolocator.requestPermission();
         if (permission != LocationPermission.always &&
-            permission != LocationPermission.whileInUse) {
-          return;
-        }
+            permission != LocationPermission.whileInUse) return;
       }
 
-      Position pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
+      final Position pos = await Geolocator.getCurrentPosition(
+        locationSettings:
+        const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
-      final LatLng coords = LatLng(pos.latitude, pos.longitude);
-
-      final placemarks =
-      await placemarkFromCoordinates(pos.latitude, pos.longitude);
-      final place = placemarks.first;
-
-      final readable =
-          "${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
-
-      setState(() {
-        fromLocation = coords;
-        fromController.text = readable;
-      });
+      await _mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(pos.latitude, pos.longitude),
+          14,
+        ),
+      );
     } catch (e) {
-      print("GPS error: $e");
+      debugPrint("GPS error: $e");
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        GoogleMap(
+          initialCameraPosition: const CameraPosition(
+            target: _karnatakaCenter,
+            zoom: 7,
+          ),
+          mapType: _currentMapType,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: true,
+          compassEnabled: true,
+          onMapCreated: (controller) => _mapController = controller,
+        ),
+
+        // Map type toggle buttons — top right
+        Positioned(
+          top: 40,
+          right: 12,
+          child: Column(
+            children: [
+              _mapTypeButton("Normal", Icons.map_outlined, MapType.normal),
+              const SizedBox(height: 8),
+              _mapTypeButton("Satellite", Icons.satellite_alt, MapType.satellite),
+              const SizedBox(height: 8),
+              _mapTypeButton("Terrain", Icons.landscape_outlined, MapType.terrain),
+              const SizedBox(height: 8),
+              _mapTypeButton("Hybrid", Icons.layers_outlined, MapType.hybrid),
+            ],
+          ),
+        ),
+
+        // GPS/compass button — bottom right
+        Positioned(
+          bottom: 30,
+          right: 20,
+          child: FloatingActionButton(
+            heroTag: "gps",
+            onPressed: _setCurrentLocation,
+            child: const Icon(CupertinoIcons.compass),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _mapTypeButton(String tag, IconData icon, MapType type) {
+    final bool isActive = _currentMapType == type;
+    return FloatingActionButton.small(
+      heroTag: tag,
+      backgroundColor: isActive ? Colors.blue : Colors.white,
+      foregroundColor: isActive ? Colors.white : Colors.black87,
+      elevation: isActive ? 4 : 2,
+      onPressed: () {
+        if (!isActive) setState(() => _currentMapType = type);
+      },
+      child: Icon(icon),
+    );
   }
 }

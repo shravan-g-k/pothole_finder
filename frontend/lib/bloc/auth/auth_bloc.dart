@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/repo/auth_repo.dart';
 import 'package:meta/meta.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 

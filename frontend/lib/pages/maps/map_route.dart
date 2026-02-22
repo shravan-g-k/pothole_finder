@@ -1,66 +1,75 @@
-// MAP view of the location of the user
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class MapView extends StatefulWidget {
-
-
-  const MapView({super.key});
+class MapRoute extends StatefulWidget {
+  const MapRoute({super.key});
 
   @override
-  State<MapView> createState() => _MapViewState();
+  State<MapRoute> createState() => _MapRouteState();
 }
 
-class _MapViewState extends State<MapView> {
-  // Test coordinates
-  LatLng from = LatLng(12.9756, 77.6060);
-  LatLng to   = LatLng(12.9177, 77.6238);
+class _MapRouteState extends State<MapRoute> {
+  GoogleMapController? _mapController;
+  MapType _currentMapType = MapType.normal;
 
-  Future<List<LatLng>> getRoute(LatLng from, LatLng to) async {
-    final url =
-        "https://api.openrouteservice.org/v2/directions/driving-car"
-        "?api_key=eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImQ4ZDJiMTM4"
-        "NDRhMjRhMWJiZjIzZjM5MGMxMDRmMzA5IiwiaCI6Im11cm11cjY0In0="
-        "&start=${from.longitude},${from.latitude}"
-        "&end=${to.longitude},${to.latitude}";
+  static const CameraPosition _initialPosition = CameraPosition(
+    target: LatLng(15.3173, 75.7139),
+    zoom: 7,
+  );
 
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode != 200) {
-      throw Exception("Route API failed");
-    }
-
-    final data = jsonDecode(response.body);
-
-    final coords = data["features"][0]["geometry"]["coordinates"];
-
-    // Convert [lng, lat] ➜ LatLng(lat, lng)
-    return coords.map<LatLng>((c) => LatLng(c[1], c[0])).toList();
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
   }
-  void testRoute() async {
-    LatLng from = LatLng(12.9756, 77.6060);
-    LatLng to = LatLng(12.9177, 77.6238);
 
-    List<LatLng> points = await getRoute(from, to);
-    print(points); // Prints all LatLng points
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Route Test")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            List<LatLng> points = await getRoute(from, to);
-            print(points);           // prints route points
-            print(points.length);    // number of polyline points
-          },
-          child: const Text("Fetch Route"),
-        ),
+      body: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: _initialPosition,
+            mapType: _currentMapType,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: true,
+            compassEnabled: true,
+            onMapCreated: (controller) => _mapController = controller,
+          ),
+
+          // Map type toggle — top right
+          Positioned(
+            top: 40,
+            right: 12,
+            child: Column(
+              children: [
+                _mapTypeButton("r_normal", Icons.map_outlined, MapType.normal),
+                const SizedBox(height: 8),
+                _mapTypeButton("r_satellite", Icons.satellite_alt, MapType.satellite),
+                const SizedBox(height: 8),
+                _mapTypeButton("r_terrain", Icons.landscape_outlined, MapType.terrain),
+                const SizedBox(height: 8),
+                _mapTypeButton("r_hybrid", Icons.layers_outlined, MapType.hybrid),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _mapTypeButton(String tag, IconData icon, MapType type) {
+    final bool isActive = _currentMapType == type;
+    return FloatingActionButton.small(
+      heroTag: tag,
+      backgroundColor: isActive ? Colors.blue : Colors.white,
+      foregroundColor: isActive ? Colors.white : Colors.black87,
+      elevation: isActive ? 4 : 2,
+      onPressed: () {
+        if (!isActive) setState(() => _currentMapType = type);
+      },
+      child: Icon(icon),
     );
   }
 }
