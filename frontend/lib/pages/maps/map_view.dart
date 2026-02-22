@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:frontend/pages/maps/search_bar.dart';
 import 'package:latlong2/latlong.dart';
 
-class MapView extends StatelessWidget {
+class MapView extends StatefulWidget {
   const MapView({super.key});
 
+  @override
+  State<MapView> createState() => _MapViewState();
+}
+
+class _MapViewState extends State<MapView> {
+
+  void onTap() {
+    
+  }
   @override
   Widget build(BuildContext context) {
     final LatLng karnatakaCenter = LatLng(15.3173, 75.7139);
