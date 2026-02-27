@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/repo/auth_repo.dart';
 import 'package:meta/meta.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepo authRepo;
@@ -23,7 +24,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         await authRepo.signInWithGoogle();
-      } catch (error) {
+      } catch (error,s) {
+        print("Auth error: $error");
+        print("Auth stack trace: $s");
+
         emit(AuthError(error.toString()));
       }
     });

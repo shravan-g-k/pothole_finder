@@ -49,12 +49,6 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  @override
-  State<MapView> createState() => _MapViewState();
-}
-
-class _MapViewState extends State<MapView> {
-
   void onTap() {
     
   }
