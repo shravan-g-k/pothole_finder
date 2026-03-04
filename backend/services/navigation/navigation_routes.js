@@ -1,7 +1,7 @@
 import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
-import { getTwoPointRoute, getMultiPointRoute } from "../../repo/maps_repo.js";
+import { getTwoPointRoute, getMultiPointRoute ,placesTextSearch} from "../../repo/maps_repo.js";
 dotenv.config();
 
 const router = express.Router();
@@ -14,4 +14,5 @@ router.get('/get-route-polyline', getTwoPointRoute);
 // Expects a JSON body: { coordinates: [[lat1, lng1], [lat2, lng2], ...] }
 router.post('/get-multi-route-polyline', getMultiPointRoute);
 
+router.get('/places-text-search', placesTextSearch);
 export default router;
