@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/auth/auth_bloc.dart';
+import 'package:frontend/bloc/maps/maps_bloc.dart';
+import 'package:frontend/bloc/search/search_bloc.dart';
+import 'package:frontend/pages/home.dart';
+import 'package:frontend/pages/maps/search_page.dart';
 import 'package:frontend/pages/wrapper.dart';
 import 'package:frontend/repo/auth_repo.dart';
+import 'package:frontend/repo/maps_repo.dart';
 import 'package:frontend/utils/helpers/instance_providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,15 +33,20 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<AuthRepo>(
           create: (_) => AuthRepo(InstanceProviders.supabaseClient.auth),
         ),
+        RepositoryProvider<MapsRepo>(
+          create: (_) => MapsRepo(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => AuthBloc(context.read<AuthRepo>())),
+          BlocProvider(create: (context) => MapsBloc(context.read<MapsRepo>())),
+          BlocProvider(create: (context) => SearchBloc(context.read<MapsRepo>())),
         ],
         child: MaterialApp(
           title: 'Pothole Finder',
           theme: ThemeData(primarySwatch: Colors.blue),
-          home: const AuthWrapper(),
+          home: const SearchPage(),
         ),
       ),
     );

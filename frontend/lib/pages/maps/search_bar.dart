@@ -66,6 +66,7 @@ class RoutingSearchBar extends StatelessWidget {
                   ),
                 ),
                 onChanged: onSearchChanged,
+                onSubmitted: onPlaceSelected,
               ),
             ],
           ),

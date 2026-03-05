@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/maps/maps_bloc.dart';
+import 'package:frontend/pages/maps/search_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +18,7 @@ class _MapPageState extends State<MapPage> {
   MapType _currentMapType = MapType.normal;
 
   static const LatLng _karnatakaCenter = LatLng(15.3173, 75.7139);
+  final List<LatLng> routePoints = [];
 
   @override
   void dispose() {
@@ -30,56 +34,115 @@ class _MapPageState extends State<MapPage> {
           permission == LocationPermission.deniedForever) {
         permission = await Geolocator.requestPermission();
         if (permission != LocationPermission.always &&
-            permission != LocationPermission.whileInUse) return;
+            permission != LocationPermission.whileInUse)
+          return;
       }
 
       final Position pos = await Geolocator.getCurrentPosition(
-        locationSettings:
-        const LocationSettings(accuracy: LocationAccuracy.high),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       await _mapController?.animateCamera(
-        CameraUpdate.newLatLngZoom(
-          LatLng(pos.latitude, pos.longitude),
-          14,
-        ),
+        CameraUpdate.newLatLngZoom(LatLng(pos.latitude, pos.longitude), 14),
       );
     } catch (e) {
       debugPrint("GPS error: $e");
     }
   }
 
-  void onTap() {
-    
+  void onTap() {}
+
+  void _onRouteSelected() {
+    const start = LatLng(12.9716, 77.5946); 
+    const end = LatLng(12.3052, 76.6551); 
+    context.read<MapsBloc>().add(GetRouteCalled(start, end));
   }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        GoogleMap(
-          initialCameraPosition: const CameraPosition(
-            target: _karnatakaCenter,
-            zoom: 7,
-          ),
-          mapType: _currentMapType,
-          myLocationEnabled: true,
-          myLocationButtonEnabled: false,
-          zoomControlsEnabled: true,
-          compassEnabled: true,
-          onMapCreated: (controller) => _mapController = controller,
+        BlocConsumer<MapsBloc, MapsState>(
+          bloc: context.read<MapsBloc>(),
+          buildWhen: (prev, curr) => curr is RouteLoaded || curr is RouteError,
+          listener: (context, state) {
+            if (state is RouteError) {
+              Navigator.of(context, rootNavigator: true).pop(); // Close loading dialog
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Error loading route: ${state.message}"),
+                ),
+              );
+            }
+            if (state is RouteLoading) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return const Center(child: CircularProgressIndicator());
+                },
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is RouteLoaded) {
+              routePoints.addAll(state.routePoints);
+              Navigator.of(
+                context,
+                rootNavigator: true,
+              ).pop(); // Close loading dialog
+            }
+            return GoogleMap(
+              initialCameraPosition: const CameraPosition(
+                target: _karnatakaCenter,
+                zoom: 7,
+              ),
+              polylines: {
+                Polyline(
+                  polylineId: const PolylineId("route"),
+                  color: Colors.blue,
+                  width: 5,
+                  points: routePoints,
+                ),
+              },
+              mapType: _currentMapType,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: true,
+              compassEnabled: true,
+              onMapCreated: (controller) => _mapController = controller,
+            );
+          },
         ),
-
+        RoutingSearchBar(
+          selectedPlaces: [],
+          suggestions: [],
+          onSearchChanged: (a) {},
+          onPlaceSelected: (a) {
+            _onRouteSelected();
+          },
+          onPlaceRemoved: (a) {},
+        ),
         // Map type toggle buttons — top right
         Positioned(
-          top: 40,
+          top: 200,
           right: 12,
           child: Column(
             children: [
               _mapTypeButton("Normal", Icons.map_outlined, MapType.normal),
               const SizedBox(height: 8),
-              _mapTypeButton("Satellite", Icons.satellite_alt, MapType.satellite),
+              _mapTypeButton(
+                "Satellite",
+                Icons.satellite_alt,
+                MapType.satellite,
+              ),
               const SizedBox(height: 8),
-              _mapTypeButton("Terrain", Icons.landscape_outlined, MapType.terrain),
+              _mapTypeButton(
+                "Terrain",
+                Icons.landscape_outlined,
+                MapType.terrain,
+              ),
               const SizedBox(height: 8),
               _mapTypeButton("Hybrid", Icons.layers_outlined, MapType.hybrid),
             ],
@@ -88,7 +151,7 @@ class _MapPageState extends State<MapPage> {
 
         // GPS/compass button — bottom right
         Positioned(
-          bottom: 30,
+          bottom: 100,
           right: 20,
           child: FloatingActionButton(
             heroTag: "gps",

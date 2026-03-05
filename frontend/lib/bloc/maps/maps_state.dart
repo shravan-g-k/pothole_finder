@@ -5,10 +5,16 @@ sealed class MapsState {}
 
 final class MapsInitial extends MapsState {}
 
-final class MapsRouteLoading extends MapsState {}
+final class RouteLoading extends MapsState {}
 
-// final class MapsRouteLoaded extends MapsState {
-//   final List<LatLng> routePoints;
+final class RouteLoaded extends MapsState {
+  final List<LatLng> routePoints;
 
-//   MapsRouteLoaded(this.routePoints);
-// }
+  RouteLoaded(this.routePoints);
+}
+
+final class RouteError extends MapsState {
+  final String message;
+
+  RouteError(this.message);
+}
