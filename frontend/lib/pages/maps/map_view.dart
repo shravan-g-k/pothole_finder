@@ -34,8 +34,9 @@ class _MapPageState extends State<MapPage> {
           permission == LocationPermission.deniedForever) {
         permission = await Geolocator.requestPermission();
         if (permission != LocationPermission.always &&
-            permission != LocationPermission.whileInUse)
+            permission != LocationPermission.whileInUse) {
           return;
+        }
       }
 
       final Position pos = await Geolocator.getCurrentPosition(

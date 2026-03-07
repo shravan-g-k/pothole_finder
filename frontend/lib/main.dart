@@ -4,8 +4,6 @@ import 'package:frontend/bloc/auth/auth_bloc.dart';
 import 'package:frontend/bloc/maps/maps_bloc.dart';
 import 'package:frontend/bloc/search/search_bloc.dart';
 import 'package:frontend/pages/home.dart';
-import 'package:frontend/pages/maps/search_page.dart';
-import 'package:frontend/pages/wrapper.dart';
 import 'package:frontend/repo/auth_repo.dart';
 import 'package:frontend/repo/maps_repo.dart';
 import 'package:frontend/utils/helpers/instance_providers.dart';
@@ -46,7 +44,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Pothole Finder',
           theme: ThemeData(primarySwatch: Colors.blue),
-          home: const SearchPage(),
+          home: const Home(),
         ),
       ),
     );

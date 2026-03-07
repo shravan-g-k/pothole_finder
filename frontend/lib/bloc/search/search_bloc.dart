@@ -14,9 +14,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       try {
         final suggestions = await _fetchSearchSuggestions(event.query);
         emit(SearchSuccess(suggestions));
-      } catch (e, s) {
-        print(e.toString());
-        print(s.toString());
+      } catch (e) {
+       
         emit(SearchFailure(e.toString()));
       }
     });

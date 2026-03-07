@@ -24,9 +24,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         await authRepo.signInWithGoogle();
-      } catch (error,s) {
-        print("Auth error: $error");
-        print("Auth stack trace: $s");
+      } catch (error) {
+        
 
         emit(AuthError(error.toString()));
       }

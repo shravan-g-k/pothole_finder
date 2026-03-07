@@ -21,7 +21,6 @@ abstract class PlaceModel with _$PlaceModel {
 }
 
 LatLng _latLngFromJson(Map<String, dynamic> json) {
-  print(json);
   // Use 'as num' to safely handle both int and double from JSON
   return LatLng(
     (json['lat'] as num).toDouble(),

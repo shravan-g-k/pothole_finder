@@ -23,7 +23,7 @@ class MapsBloc extends Bloc<MapsEvent, MapsState> {
           decodeJSON,
         );
         emit(RouteLoaded(routePoints));
-      } catch (e, s) {
+      } catch (e) {
         emit(RouteError(e.toString()));
       }
     });
