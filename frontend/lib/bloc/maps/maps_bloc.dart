@@ -15,17 +15,20 @@ class MapsBloc extends Bloc<MapsEvent, MapsState> {
       emit(RouteLoading());
       try {
         final route = await mapsRepo.getRoute([event.start, event.end]);
-        final decodeJSON = (jsonDecode(route)['polyline']['coordinates'] as List<dynamic>).map(
-          (coord) => List<double>.from(coord),
-        ).toList();
+        final decodeJSON =
+            (jsonDecode(route)['polyline']['coordinates'] as List<dynamic>)
+                .map((coord) => List<double>.from(coord))
+                .toList();
         //deocde string to json then get polyline and cocordinates
-        final routePoints = mapsRepo.changeGeoJsonToLatLng(
-          decodeJSON,
-        );
+        final routePoints = mapsRepo.changeGeoJsonToLatLng(decodeJSON);
         emit(RouteLoaded(routePoints));
       } catch (e) {
         emit(RouteError(e.toString()));
       }
+    });
+    on<SetLiveLocation>((event, emit) {
+       
+      emit(LiveLocationUpdated(liveLocation: event.liveLocation));
     });
   }
 }

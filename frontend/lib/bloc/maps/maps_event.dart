@@ -9,3 +9,9 @@ class GetRouteCalled extends MapsEvent {
 
   GetRouteCalled(this.start, this.end);
 }
+
+class SetLiveLocation extends MapsEvent {
+  final LatLng liveLocation;
+
+  SetLiveLocation(this.liveLocation);
+}

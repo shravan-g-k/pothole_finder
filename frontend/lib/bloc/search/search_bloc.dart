@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/models/place_model/place_model.dart';
 import 'package:frontend/repo/maps_repo.dart';
-import 'package:meta/meta.dart';
 
 part 'search_event.dart';
 part 'search_state.dart';
@@ -15,7 +15,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         final suggestions = await _fetchSearchSuggestions(event.query);
         emit(SearchSuccess(suggestions));
       } catch (e) {
-       
+        debugPrint(e.toString());
         emit(SearchFailure(e.toString()));
       }
     });

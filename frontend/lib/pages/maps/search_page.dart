@@ -1,66 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/maps/maps_bloc.dart';
 import 'package:frontend/bloc/search/search_bloc.dart';
 import 'package:frontend/models/place_model/place_model.dart';
 
 // ---------------------------------------------------------------------------
-// Mock search function – replace with your real API / business logic
-// ---------------------------------------------------------------------------
-Future<List<SearchResult>> fetchSuggestions(String query) async {
-  // Simulate network latency
-  await Future.delayed(const Duration(milliseconds: 300));
-
-  if (query.isEmpty) return [];
-
-  // Mock data – swap for a real network call
-  final all = [
-    SearchResult(
-      title: 'Flutter architecture patterns',
-      subtitle: 'BLoC, Riverpod, MVC',
-    ),
-    SearchResult(
-      title: 'Flutter state management',
-      subtitle: 'No setState ever again',
-    ),
-    SearchResult(
-      title: 'Dart null safety guide',
-      subtitle: 'Sound null safety deep-dive',
-    ),
-    SearchResult(title: 'Flutter animations', subtitle: 'Implicit & explicit'),
-    SearchResult(
-      title: 'Firebase with Flutter',
-      subtitle: 'Auth, Firestore, Storage',
-    ),
-    SearchResult(
-      title: 'SearchController in Flutter',
-      subtitle: 'Native search delegation',
-    ),
-    SearchResult(
-      title: 'Custom painters in Flutter',
-      subtitle: 'Canvas & paint',
-    ),
-    SearchResult(
-      title: 'Flutter testing handbook',
-      subtitle: 'Unit, widget, integration',
-    ),
-  ];
-
-  return all
-      .where((r) => r.title.toLowerCase().contains(query.toLowerCase()))
-      .toList();
-}
-
-// ---------------------------------------------------------------------------
-// Data model
-// ---------------------------------------------------------------------------
-class SearchResult {
-  const SearchResult({required this.title, required this.subtitle});
-  final String title;
-  final String subtitle;
-}
-
-// ---------------------------------------------------------------------------
-// Search page – zero setState
+// Search page
 // ---------------------------------------------------------------------------
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -103,7 +48,11 @@ class _SearchPageState extends State<SearchPage> {
     _controller.text = result.name;
     _focusNode.unfocus();
     _results.value = [];
-    // TODO: navigate or handle selection
+    //TODO: error handle null value
+    final liveLocation = context.read<MapsBloc>().state.liveLocation!;
+
+    context.read<MapsBloc>().add(GetRouteCalled(liveLocation, result.location));
+    Navigator.pop(context);
   }
 
   @override
@@ -140,7 +89,6 @@ class _SearchPageState extends State<SearchPage> {
                   _results.value = state.suggestions;
                   _loading.value = false;
                 } else if (state is SearchFailure) {
-                  
                   _results.value = [];
                   _loading.value = false;
                 }

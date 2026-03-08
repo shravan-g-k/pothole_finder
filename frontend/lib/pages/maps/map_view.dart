@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/maps/maps_bloc.dart';
-import 'package:frontend/pages/maps/search_bar.dart';
+import 'package:frontend/pages/maps/map_top_bar.dart';
+import 'package:frontend/utils/constants/routes/routes.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/cupertino.dart';
@@ -44,7 +45,11 @@ class _MapPageState extends State<MapPage> {
           accuracy: LocationAccuracy.high,
         ),
       );
-
+      if (mounted) {
+        context.read<MapsBloc>().add(
+          SetLiveLocation(LatLng(pos.latitude, pos.longitude)),
+        );
+      }
       await _mapController?.animateCamera(
         CameraUpdate.newLatLngZoom(LatLng(pos.latitude, pos.longitude), 14),
       );
@@ -53,12 +58,8 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  void onTap() {}
-
-  void _onRouteSelected() {
-    const start = LatLng(12.9716, 77.5946); 
-    const end = LatLng(12.3052, 76.6551); 
-    context.read<MapsBloc>().add(GetRouteCalled(start, end));
+  void onTap() {
+    Navigator.pushNamed(context, Routes.searchPage);
   }
 
   @override
@@ -70,7 +71,10 @@ class _MapPageState extends State<MapPage> {
           buildWhen: (prev, curr) => curr is RouteLoaded || curr is RouteError,
           listener: (context, state) {
             if (state is RouteError) {
-              Navigator.of(context, rootNavigator: true).pop(); // Close loading dialog
+              Navigator.of(
+                context,
+                rootNavigator: true,
+              ).pop(); // Close loading dialog
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("Error loading route: ${state.message}"),
@@ -116,15 +120,7 @@ class _MapPageState extends State<MapPage> {
             );
           },
         ),
-        RoutingSearchBar(
-          selectedPlaces: [],
-          suggestions: [],
-          onSearchChanged: (a) {},
-          onPlaceSelected: (a) {
-            _onRouteSelected();
-          },
-          onPlaceRemoved: (a) {},
-        ),
+        MapTopBar(),
         // Map type toggle buttons — top right
         Positioned(
           top: 200,
