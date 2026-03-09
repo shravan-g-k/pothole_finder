@@ -10,9 +10,9 @@ part 'maps_state.dart';
 
 class MapsBloc extends Bloc<MapsEvent, MapsState> {
   final MapsRepo mapsRepo;
-  MapsBloc(this.mapsRepo) : super(MapsInitial()) {
+  MapsBloc(this.mapsRepo) : super(MapsInitial(null)) {
     on<GetRouteCalled>((event, emit) async {
-      emit(RouteLoading());
+      emit(RouteLoading( state.liveLocation));
       try {
         final route = await mapsRepo.getRoute([event.start, event.end]);
         final decodeJSON =
@@ -21,14 +21,19 @@ class MapsBloc extends Bloc<MapsEvent, MapsState> {
                 .toList();
         //deocde string to json then get polyline and cocordinates
         final routePoints = mapsRepo.changeGeoJsonToLatLng(decodeJSON);
-        emit(RouteLoaded(routePoints));
+        emit(RouteLoaded( 
+          state.liveLocation,
+          routePoints: mapsRepo.createPolylines(routePoints),
+          start: event.start,
+          destination: event.end,
+        ));
       } catch (e) {
-        emit(RouteError(e.toString()));
+        emit(RouteError(e.toString(),null));
       }
     });
     on<SetLiveLocation>((event, emit) {
        
-      emit(LiveLocationUpdated(liveLocation: event.liveLocation));
+      emit(LiveLocationUpdated( event.liveLocation));
     });
   }
 }

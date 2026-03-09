@@ -19,7 +19,9 @@ class _MapPageState extends State<MapPage> {
   MapType _currentMapType = MapType.normal;
 
   static const LatLng _karnatakaCenter = LatLng(15.3173, 75.7139);
-  final List<LatLng> routePoints = [];
+  final Set<Polyline> polylines = {};
+
+  MediaQueryData get _mq => MediaQuery.of(context);
 
   @override
   void dispose() {
@@ -51,11 +53,30 @@ class _MapPageState extends State<MapPage> {
         );
       }
       await _mapController?.animateCamera(
-        CameraUpdate.newLatLngZoom(LatLng(pos.latitude, pos.longitude), 14),
+        CameraUpdate.newLatLngZoom(
+          LatLng(pos.latitude, pos.longitude),
+          _mq.size.width > 400 ? 16 : 15,
+        ),
       );
     } catch (e) {
       debugPrint("GPS error: $e");
     }
+  }
+
+  void _zoomOutOnRoute(LatLng start, LatLng end) {
+    final bounds = LatLngBounds(
+      southwest: LatLng(
+        start.latitude < end.latitude ? start.latitude : end.latitude,
+        start.longitude < end.longitude ? start.longitude : end.longitude,
+      ),
+      northeast: LatLng(
+        start.latitude > end.latitude ? start.latitude : end.latitude,
+        start.longitude > end.longitude ? start.longitude : end.longitude,
+      ),
+    );
+    _mapController?.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds, _mq.size.width * 0.3),
+    );
   }
 
   void onTap() {
@@ -80,8 +101,14 @@ class _MapPageState extends State<MapPage> {
                   content: Text("Error loading route: ${state.message}"),
                 ),
               );
-            }
-            if (state is RouteLoading) {
+            } else if (state is RouteLoaded) {
+              polylines.addAll(state.routePoints);
+              _zoomOutOnRoute(state.start, state.destination);
+              Navigator.of(
+                context,
+                rootNavigator: true,
+              ).pop(); // Close loading dialog
+            } else if (state is RouteLoading) {
               showDialog(
                 context: context,
                 builder: (context) {
@@ -91,26 +118,22 @@ class _MapPageState extends State<MapPage> {
             }
           },
           builder: (context, state) {
-            if (state is RouteLoaded) {
-              routePoints.addAll(state.routePoints);
-              Navigator.of(
-                context,
-                rootNavigator: true,
-              ).pop(); // Close loading dialog
-            }
             return GoogleMap(
               initialCameraPosition: const CameraPosition(
                 target: _karnatakaCenter,
                 zoom: 7,
               ),
-              polylines: {
-                Polyline(
-                  polylineId: const PolylineId("route"),
-                  color: Colors.blue,
-                  width: 5,
-                  points: routePoints,
-                ),
-              },
+              polylines: polylines,
+              markers:
+                  state is RouteLoaded
+                      ? {
+                        Marker(
+                          markerId: const MarkerId('destination'),
+                          position: state.destination,
+                          infoWindow: const InfoWindow(title: 'Destination'),
+                        ),
+                      }
+                      : {},
               mapType: _currentMapType,
               myLocationEnabled: true,
               myLocationButtonEnabled: false,

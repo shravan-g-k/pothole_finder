@@ -1,6 +1,7 @@
+
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/models/place_model/place_model.dart';
-import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class MapsRepo {
   final backendEndpoint = '${dotenv.env['BACKEND_URL']!}/navigation';
 
+  /// Fetch the route between two or more waypoints.
   Future<String> getRoute(List<LatLng> waypoints) async {
     if (waypoints.length < 2) {
       throw Exception('At least two waypoints are required to get a route.');
@@ -42,19 +44,21 @@ class MapsRepo {
     }
   }
 
-  List<LatLng> convertToLatLng(String encodedString) {
-    // Decodes the string into a list of PointLatLng
-    final polyline = decodePolyline(encodedString);
-
-    // Convert PointLatLng to Google Maps LatLng
-    return polyline
-        .map((point) => LatLng(point[0].toDouble(), point[1].toDouble()))
-        .toList();
-  }
-
+  
   List<LatLng> changeGeoJsonToLatLng(List<List<double>> encodedString) {
     //flip the values  in the list since geojson is in the format [lng, lat] and we need [lat, lng]
     return encodedString.map((point) => LatLng(point[1], point[0])).toList();
+  }
+
+  Set<Polyline> createPolylines(List<LatLng> routePoints) {
+    return {
+      Polyline(
+        polylineId: const PolylineId('route'),
+        points: routePoints,
+        color: const Color(0xFF4285F4),
+        width: 5,
+      ),
+    };
   }
 
   Future<List<PlaceModel>> getTextSearchResults(String query) async {
