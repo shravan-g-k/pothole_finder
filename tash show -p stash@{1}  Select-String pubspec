@@ -1,0 +1,140 @@
+[1mdiff --git a/.idea/caches/deviceStreaming.xml b/.idea/caches/deviceStreaming.xml[m
+[1mindex 789bdd8..5c94783 100644[m
+[1m--- a/.idea/caches/deviceStreaming.xml[m
+[1m+++ b/.idea/caches/deviceStreaming.xml[m
+[36m@@ -51,18 +51,6 @@[m
+           <option name="screenX" value="1080" />[m
+           <option name="screenY" value="2412" />[m
+         </PersistentDeviceSelectionData>[m
+[31m-        <PersistentDeviceSelectionData>[m
+[31m-          <option name="api" value="35" />[m
+[31m-          <option name="brand" value="OnePlus" />[m
+[31m-          <option name="codename" value="OP5552L1" />[m
+[31m-          <option name="id" value="OP5552L1" />[m
+[31m-          <option name="labId" value="google" />[m
+[31m-          <option name="manufacturer" value="OnePlus" />[m
+[31m-          <option name="name" value="CPH2415" />[m
+[31m-          <option name="screenDensity" value="480" />[m
+[31m-          <option name="screenX" value="1080" />[m
+[31m-          <option name="screenY" value="2412" />[m
+[31m-        </PersistentDeviceSelectionData>[m
+         <PersistentDeviceSelectionData>[m
+           <option name="api" value="34" />[m
+           <option name="brand" value="OPPO" />[m
+[36m@@ -136,6 +124,18 @@[m
+           <option name="screenX" value="720" />[m
+           <option name="screenY" value="1600" />[m
+         </PersistentDeviceSelectionData>[m
+[32m+[m[32m        <PersistentDeviceSelectionData>[m
+[32m+[m[32m          <option name="api" value="34" />[m
+[32m+[m[32m          <option name="brand" value="samsung" />[m
+[32m+[m[32m          <option name="codename" value="a13" />[m
+[32m+[m[32m          <option name="id" value="a13" />[m
+[32m+[m[32m          <option name="labId" value="google" />[m
+[32m+[m[32m          <option name="manufacturer" value="Samsung" />[m
+[32m+[m[32m          <option name="name" value="Galaxy A13" />[m
+[32m+[m[32m          <option name="screenDensity" value="450" />[m
+[32m+[m[32m          <option name="screenX" value="1080" />[m
+[32m+[m[32m          <option name="screenY" value="2408" />[m
+[32m+[m[32m        </PersistentDeviceSelectionData>[m
+         <PersistentDeviceSelectionData>[m
+           <option name="api" value="34" />[m
+           <option name="brand" value="samsung" />[m
+[36m@@ -148,6 +148,30 @@[m
+           <option name="screenX" value="1080" />[m
+           <option name="screenY" value="2408" />[m
+         </PersistentDeviceSelectionData>[m
+[32m+[m[32m        <PersistentDeviceSelectionData>[m
+[32m+[m[32m          <option name="api" value="35" />[m
+[32m+[m[32m          <option name="brand" value="samsung" />[m
+[32m+[m[32m          <option name="codename" value="a14xmsq" />[m
+[32m+[m[32m          <option name="id" value="a14xmsq" />[m
+[32m+[m[32m          <option name="labId" value="google" />[m
+[32m+[m[32m          <option name="manufacturer" value="Samsung" />[m
+[32m+[m[32m          <option name="name" value="Galaxy A14 5G" />[m
+[32m+[m[32m          <option name="screenDensity" value="450" />[m
+[32m+[m[32m          <option name="screenX" value="1080" />[m
+[32m+[m[32m          <option name="screenY" value="2408" />[m
+[32m+[m[32m        </PersistentDeviceSelectionData>[m
+[32m+[m[32m        <PersistentDeviceSelectionData>[m
+[32m+[m[32m          <option name="api" value="35" />[m
+[32m+[m[32m          <option name="brand" value="samsung" />[m
+[32m+[m[32m          <option name="codename" value="a14xmtfn" />[m
+[32m+[m[32m          <option name="id" value="a14xmtfn" />[m
+[32m+[m[32m          <option name="labId" value="google" />[m
+[32m+[m[32m          <option name="manufacturer" value="Samsung" />[m
+[32m+[m[32m          <option name="name" value="Galaxy A14 5G" />[m
+[32m+[m[32m          <option name="screenDensity" value="450" />[m
+[32m+[m[32m          <option name="screenX" value="1080" />[m
+[32m+[m[32m          <option name="screenY" value="2408" />[m
+[32m+[m[32m        </PersistentDeviceSelectionData>[m
+         <PersistentDeviceSelectionData>[m
+           <option name="api" value="34" />[m
+           <option name="brand" value="samsung" />[m
+[36m@@ -172,6 +196,18 @@[m
+           <option name="screenX" value="1080" />[m
+           <option name="screenY" value="2340" />[m
+         </PersistentDeviceSelectionData>[m
+[32m+[m[32m        <PersistentDeviceSelectionData>[m
+[32m+[m[32m          <option name="api" value="36" />[m
+[32m+[m[32m          <option name="brand" value="samsung" />[m
+[32m+[m[32m          <option name="codename" value="a15x" />[m
+[32m+[m[32m          <option name="id" value="a15x" />[m
+[32m+[m[32m          <option name="labId" value="google" />[m
+[32m+[m[32m          <option name="manufacturer" value="Samsung" />[m
+[32m+[m[32m          <option name="name" value="A15 5G" />[m
+[32m+[m[32m          <option name="screenDensity" value="450" />[m
+[32m+[m[32m          <option name="screenX" value="1080" />[m
+[32m+[m[32m          <option name="screenY" value="2340" />[m
+[32m+[m[32m        </PersistentDeviceSelectionData>[m
+         <PersistentDeviceSelectionData>[m
+           <option name="api" value="35" />[m
+           <option name="brand" value="samsung" />[m
+[36m@@ -196,6 +232,30 @@[m
+           <option name="screenX" value="1080" />[m
+           <option name="screenY" value="2340" />[m
+         </PersistentDeviceSelectionData>[m
+[32m+[m[32m        <PersistentDeviceSelectionData>[m
+[32m+[m[32m          <option name="api" value="36" />[m
+[32m+[m[32m          <option name="brand" value="samsung" />[m
+[32m+[m[32m          <option name="codename" value="a16x" />[m
+[32m+[m[32m          <option name="id" value="a16x" />[m
+[32m+[m[32m          <option name="labId" value="google" />[m
+[32m+[m[32m          <option name="manufacturer" value="Samsung" />[m
+[32m+[m[32m          <option name="name" value="A16 5G" />[m
+[32m+[m[32m          <option name="screenDensity" value="450" />[m
+[32m+[m[32m          <option name="screenX" value="1080" />[m
+[32m+[m[32m          <option name="screenY" value="2340" />[m
+[32m+[m[32m        </PersistentDeviceSelectionData>[m
+[32m+[m[32m        <PersistentDeviceSelectionData>[m
+[32m+[m[32m          <option name="api" value="31" />[m
+[32m+[m[32m          <option name="brand" value="samsung" />[m
+[32m+[m[32m          <option name="codename" value="a21" />[m
+[32m+[m[32m          <option name="id" value="a21" />[m
+[32m+[m[32m          <option name="labId" value="google" />[m
+[32m+[m[32m          <option name="manufacturer" value="Samsung" />[m
+[32m+[m[32m          <option name="name" value="Galaxy A21" />[m
+[32m+[m[32m          <option name="screenDensity" value="300" />[m
+[32m+[m[32m          <option name="screenX" value="720" />[m
+[32m+[m[32m          <option name="screenY" value="1600" />[m
+[32m+[m[32m        </PersistentDeviceSelectionData>[m
+         <PersistentDeviceSelectionData>[m
+           <option name="api" value="36" />[m
+           <option name="brand" value="samsung" />[m
+[36m@@ -244,6 +304,18 @@[m
+           <option name="screenX" value="1080" />[m
+           <option name="screenY" value="2340" />[m
+         </PersistentDeviceSelectionData>[m
+[32m+[m[32m        <PersistentDeviceSelectionData>[m
+[32m+[m[32m          <option name="api" value="36" />[m
+[32m+[m[32m          <option name="brand" value="samsung" />[m
+[32m+[m[32m          <option name="codename" value="a35x" />[m
+[32m+[m[32m          <option name="id" value="a35x" />[m
+[32m+[m[32m          <option name="labId" value="google" />[m
+[32m+[m[32m          <option name="manufacturer" value="Samsung" />[m
+[32m+[m[32m          <option name="name" value="A35" />[m
+[32m+[m[32m          <option name="screenDensity" value="450" />[m
+[32m+[m[32m          <option name="screenX" value="1080" />[m
+[32m+[m[32m          <option name="screenY" value="2340" />[m
+[32m+[m[32m        </PersistentDeviceSelectionData>[m
+         <P
