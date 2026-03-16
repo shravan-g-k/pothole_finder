@@ -6,8 +6,6 @@ part 'place_model.g.dart';
 
 @freezed
 abstract class PlaceModel with _$PlaceModel {
-  // 1. The constructor must be a factory with no body
-  // 2. The redirected constructor name (e.g., _PlaceModel) is required
   const factory PlaceModel({
     required String name,
     required String address,
