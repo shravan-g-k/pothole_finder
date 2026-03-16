@@ -5,9 +5,11 @@ sealed class MapsEvent {}
 
 class GetRouteCalled extends MapsEvent {
   final LatLng start;
+  final String startAddress;
   final LatLng end;
+  final String endAddress;
 
-  GetRouteCalled(this.start, this.end);
+  GetRouteCalled(this.start, this.end, this.startAddress, this.endAddress);
 }
 
 

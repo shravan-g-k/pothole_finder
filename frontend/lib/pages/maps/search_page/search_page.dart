@@ -129,33 +129,32 @@ class _SearchPageState extends State<SearchPage> {
 
   /// Validates both fields and dispatches GetRouteCalled when both are ready.
   void _tryDispatchRoute() {
-    bool hasError = false;
-
     if (_fromController.text.isEmpty) {
       _fromError.value = 'Please enter a starting point';
-      hasError = true;
+      return;
     }
     if (_toController.text.isEmpty) {
       _toError.value = 'Please enter a destination';
-      hasError = true;
+      return;
     }
-
-    if (hasError) return;
 
     // Text is present but the user never tapped a suggestion — show guidance
     if (_fromSelected == null) {
       _fromError.value = 'Please select a suggestion from the list';
-      hasError = true;
+      return;
     }
     if (_toSelected == null) {
       _toError.value = 'Please select a suggestion from the list';
-      hasError = true;
+      return;
     }
 
-    if (hasError) return;
-
     context.read<MapsBloc>().add(
-      GetRouteCalled(_fromSelected!.location, _toSelected!.location),
+      GetRouteCalled(
+        _fromSelected!.location,
+        _toSelected!.location,
+        _fromSelected!.name,
+        _toSelected!.name,
+      ),
     );
     Navigator.pop(context);
   }

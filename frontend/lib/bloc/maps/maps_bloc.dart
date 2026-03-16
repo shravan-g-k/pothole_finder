@@ -26,6 +26,8 @@ class MapsBloc extends Bloc<MapsEvent, MapsState> {
           routePoints: mapsRepo.createPolylines(routePoints),
           start: event.start,
           destination: event.end,
+          startAddress: event.startAddress,
+          endAddress: event.endAddress,
         ));
       } catch (e) {
         emit(RouteError(e.toString(),null));

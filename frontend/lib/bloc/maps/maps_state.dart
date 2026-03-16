@@ -23,12 +23,16 @@ final class RouteLoaded extends MapsState {
   final Set<Polyline> routePoints;
   final LatLng start;
   final LatLng destination;
+  final String startAddress;
+  final String endAddress;
 
   const RouteLoaded(
     super.liveLocation, {
     required this.routePoints,
     required this.start,
     required this.destination,
+    required this.startAddress,
+    required this.endAddress,
   });
 }
 
