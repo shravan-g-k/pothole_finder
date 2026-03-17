@@ -4,7 +4,7 @@ import 'package:frontend/bloc/auth/auth_bloc.dart';
 import 'package:frontend/bloc/maps/maps_bloc.dart';
 import 'package:frontend/bloc/search/search_bloc.dart';
 import 'package:frontend/pages/home.dart';
-import 'package:frontend/pages/maps/map_view.dart';
+import 'package:frontend/pages/maps/map_page/map_page.dart';
 import 'package:frontend/pages/maps/search_page/search_page.dart';
 import 'package:frontend/repo/auth_repo.dart';
 import 'package:frontend/repo/maps_repo.dart';

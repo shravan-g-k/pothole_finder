@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/pages/home/home_page.dart';
-import 'package:frontend/pages/maps/map_view.dart';
+import 'package:frontend/pages/maps/map_page/map_page.dart';
 import 'package:frontend/pages/profile/profile_page.dart';
 import 'package:frontend/utils/constants/enums/bottom_bar_button_enum.dart';
 
