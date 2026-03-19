@@ -15,8 +15,9 @@ class AuthWrapper extends StatelessWidget {
         if (state is AuthLoaded) {
           return const Home();
         } else if (state is AuthUnauthenticated) {
-          return const UserInfoFieldsPage();
+          return const UserInfoFieldsPage();//chnage to login page (which has the google button)
         }
+        //if state is AuthDetailsMissing send UserInfoFieldsPage()
         return const SplashScreen();
       },
     );

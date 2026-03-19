@@ -50,6 +50,15 @@ dependencies:
   google_polyline_algorithm: ^3.1.0
   freezed_annotation: ^3.1.0
   json_annotation: ^4.11.0
+  flutter_launcher_icons: ^0.14.4
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/images/pothole_icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  adaptive_icon_background: "assets/images/pothole_icon.png"
+  adaptive_icon_foreground: "assets/images/pothole_icon.png"
 
 dev_dependencies:
   flutter_test:
