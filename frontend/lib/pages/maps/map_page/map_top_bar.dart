@@ -11,6 +11,7 @@ class MapTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     const double padding = 8;
+    final theme = Theme.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -22,16 +23,12 @@ class MapTopBar extends StatelessWidget {
         right: padding,
         top: mediaQuery.padding.top,
       ),
-      height: 56,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(BoxDecorConst.borderRadius),
       ),
       child: BlocConsumer<MapsBloc, MapsState>(
         listener: (context, state) {},
-        listenWhen: (previous, current) {
-          return current is RouteLoaded;
-        },
         builder: (context, state) {
           String? from;
           String? to;
@@ -41,31 +38,82 @@ class MapTopBar extends StatelessWidget {
             to = state.endAddress;
           }
 
-          return GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, Routes.searchPage);
-            },
-            child: Row(
-              children: [
-                Flexible(
-                  child: _TopBarField(
-                    icon: Icons.my_location_rounded,
-                    label: from,
-                  ),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, Routes.searchPage);
+                },
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: _TopBarField(
+                        icon: Icons.my_location_rounded,
+                        label: from,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 20,
+                      color: Colors.black26,
+                    ),
+                    Flexible(
+                      child: _TopBarField(
+                        icon: Icons.location_on_rounded,
+                        label: to,
+                      ),
+                    ),
+                  ],
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 20,
-                  color: Colors.black26,
-                ),
-                Flexible(
-                  child: _TopBarField(
-                    icon: Icons.location_on_rounded,
-                    label: to,
-                  ),
+              ),
+              if (state is RouteLoaded) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: IconButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            theme.colorScheme.error,
+                          ),
+                          foregroundColor: WidgetStatePropertyAll(
+                            theme.colorScheme.onError,
+                          ),
+                        ),
+                        onPressed: () {
+                          context.read<MapsBloc>().add(ResetMap());
+                        },
+                        icon: const Icon(Icons.cancel_presentation_rounded),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 8,
+                      child: TextButton(
+                        onPressed: () {},
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            theme.colorScheme.primary,
+                          ),
+                          foregroundColor: WidgetStatePropertyAll(
+                            theme.colorScheme.onPrimary,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.navigation_rounded),
+                            const Text("Start"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            ),
+            ],
           );
         },
       ),
@@ -98,11 +146,12 @@ class _TopBarField extends StatelessWidget {
               Flexible(
                 child: Text(
                   label ?? "",
+                  maxLines: 1,
                   style: TextStyle(
                     color: theme.colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.w500,
                   ),
-                  overflow: TextOverflow.clip,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

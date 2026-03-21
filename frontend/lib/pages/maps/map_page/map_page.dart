@@ -17,6 +17,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final ValueNotifier<MapType> _mapTypeNotifier = ValueNotifier(MapType.normal);
+  GoogleMapController? _mapController;
 
   @override
   void dispose() {
@@ -43,12 +44,16 @@ class _MapPageState extends State<MapPage> {
         ),
       );
 
-      if (mounted) {
-        context.read<MapsBloc>().add(
-          SetLiveLocation(LatLng(pos.latitude, pos.longitude)),
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(pos.latitude, pos.longitude),
+              zoom: 15,
+            ),
+          ),
         );
       }
-      // TODO: animate camera to the current location
     } catch (e) {
       debugPrint("GPS error: $e");
     }
@@ -60,7 +65,10 @@ class _MapPageState extends State<MapPage> {
       children: [
         ValueListenableBuilder<MapType>(
           valueListenable: _mapTypeNotifier,
-          builder: (_, mapType, __) => MapView(mapType: mapType),
+          builder: (_, mapType, __) => MapView(
+            mapType: mapType,
+            onMapCreated: (controller) => _mapController = controller,
+          ),
         ),
         const MapTopBar(),
         Positioned(

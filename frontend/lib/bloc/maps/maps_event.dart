@@ -13,6 +13,7 @@ class GetRouteCalled extends MapsEvent {
 }
 
 
+class ResetMap extends MapsEvent {}
 
 class SetLiveLocation extends MapsEvent {
   final LatLng liveLocation;

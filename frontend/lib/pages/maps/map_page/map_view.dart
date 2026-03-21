@@ -4,8 +4,9 @@ import 'package:frontend/bloc/maps/maps_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapView extends StatefulWidget {
-  const MapView({super.key, required this.mapType});
+  const MapView({super.key, required this.mapType, this.onMapCreated});
   final MapType mapType;
+  final void Function(GoogleMapController)? onMapCreated;
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -39,9 +40,14 @@ class _MapViewState extends State<MapView> {
   Widget build(BuildContext context) {
     return BlocConsumer<MapsBloc, MapsState>(
           bloc: context.read<MapsBloc>(),
-          buildWhen: (prev, curr) => curr is RouteLoaded || curr is RouteError,
+          buildWhen: (prev, curr) =>
+              curr is RouteLoaded || curr is RouteError || curr is MapsInitial,
           listener: (context, state) {
-            if (state is RouteError) {
+            if (state is MapsInitial) {
+              setState(() {
+                polylines.clear();
+              });
+            } else if (state is RouteError) {
               Navigator.of(
                 context,
                 rootNavigator: true,
@@ -89,7 +95,10 @@ class _MapViewState extends State<MapView> {
               myLocationButtonEnabled: false,
               zoomControlsEnabled: true,
               compassEnabled: true,
-              onMapCreated: (controller) => _mapController = controller,
+              onMapCreated: (controller) {
+                _mapController = controller;
+                widget.onMapCreated?.call(controller);
+              },
             );
           },
         );

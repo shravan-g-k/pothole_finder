@@ -34,8 +34,10 @@ class MapsBloc extends Bloc<MapsEvent, MapsState> {
       }
     });
     on<SetLiveLocation>((event, emit) {
-       
-      emit(LiveLocationUpdated( event.liveLocation));
+      emit(LiveLocationUpdated(event.liveLocation));
+    });
+    on<ResetMap>((event, emit) {
+      emit(MapsInitial(state.liveLocation));
     });
   }
 }
