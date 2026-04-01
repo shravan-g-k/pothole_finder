@@ -20,6 +20,12 @@ class _MapPageState extends State<MapPage> {
   GoogleMapController? _mapController;
 
   @override
+  void initState() {
+    super.initState();
+    _setCurrentLocation();
+  }
+
+  @override
   void dispose() {
     _mapTypeNotifier.dispose();
     super.dispose();
@@ -43,6 +49,12 @@ class _MapPageState extends State<MapPage> {
           accuracy: LocationAccuracy.high,
         ),
       );
+
+      if (mounted) {
+        context.read<MapsBloc>().add(
+          SetLiveLocation(LatLng(pos.latitude, pos.longitude)),
+        );
+      }
 
       if (_mapController != null) {
         _mapController!.animateCamera(
