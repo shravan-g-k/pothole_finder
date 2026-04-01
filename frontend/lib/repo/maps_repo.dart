@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/models/place_model/place_model.dart';
@@ -44,7 +43,6 @@ class MapsRepo {
     }
   }
 
-  
   List<LatLng> changeGeoJsonToLatLng(List<List<double>> encodedString) {
     //flip the values  in the list since geojson is in the format [lng, lat] and we need [lat, lng]
     return encodedString.map((point) => LatLng(point[1], point[0])).toList();
@@ -65,6 +63,7 @@ class MapsRepo {
     final Uri uri = Uri.parse(
       '$backendEndpoint/places-text-search?query=$query',
     );
+
     http.Response response = await http.get(uri);
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
