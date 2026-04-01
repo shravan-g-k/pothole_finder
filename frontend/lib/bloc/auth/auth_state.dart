@@ -14,6 +14,8 @@ final class AuthLoaded extends AuthState {
 
 final class AuthUnauthenticated extends AuthState {}
 
+final class AuthDetailsMissing extends AuthState {}
+
 final class AuthError extends AuthState {
   final String message;
   AuthError(this.message);
