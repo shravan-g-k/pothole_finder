@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/maps/maps_bloc.dart';
 import 'package:frontend/pages/home/home_page.dart';
 import 'package:frontend/pages/maps/map_page/map_page.dart';
 import 'package:frontend/pages/profile/profile_page.dart';
@@ -40,31 +42,38 @@ class Home extends StatelessWidget {
           borderRadius: BorderRadius.circular(25),
         ),
         margin: const EdgeInsets.all(16),
-        child: ValueListenableBuilder(
-          valueListenable: page,
-          builder: (context, value, child) {
-            return NavigationBar(
-              backgroundColor: Colors.transparent,
-              destinations: [
-                NavigationDestination(
-                  icon: const Icon(Icons.home),
-                  label: 'Home',
-                  selectedIcon: const Icon(Icons.home),
-                ),
-                NavigationDestination(
-                  icon: const Icon(Icons.map),
-                  label: 'Maps',
-                  selectedIcon: const Icon(Icons.map),
-                ),
-                NavigationDestination(
-                  icon: const Icon(Icons.person),
-                  label: 'Profile',
-                  selectedIcon: const Icon(Icons.person),
-                ),
-              ],
-              selectedIndex: page.value.index,
-              onDestinationSelected: (index) {
-                page.value = BottomBarButtonEnum.values[index];
+        child: BlocBuilder<MapsBloc, MapsState>(
+          builder: (context, state) {
+            if (state is RouteNavigationStarted) {
+              return const SizedBox.shrink();
+            }
+            return ValueListenableBuilder(
+              valueListenable: page,
+              builder: (context, value, child) {
+                return NavigationBar(
+                  backgroundColor: Colors.transparent,
+                  destinations: [
+                    NavigationDestination(
+                      icon: const Icon(Icons.home),
+                      label: 'Home',
+                      selectedIcon: const Icon(Icons.home),
+                    ),
+                    NavigationDestination(
+                      icon: const Icon(Icons.map),
+                      label: 'Maps',
+                      selectedIcon: const Icon(Icons.map),
+                    ),
+                    NavigationDestination(
+                      icon: const Icon(Icons.person),
+                      label: 'Profile',
+                      selectedIcon: const Icon(Icons.person),
+                    ),
+                  ],
+                  selectedIndex: page.value.index,
+                  onDestinationSelected: (index) {
+                    page.value = BottomBarButtonEnum.values[index];
+                  },
+                );
               },
             );
           },

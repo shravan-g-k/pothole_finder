@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/maps/maps_bloc.dart';
-import 'package:frontend/pages/maps/map_page/map_top_bar.dart';
+import 'package:frontend/pages/maps/map_page/widgets/map_top_bar.dart';
 import 'package:frontend/pages/maps/map_page/map_view.dart';
 import 'package:frontend/pages/maps/map_page/map_type_selector.dart';
-import 'package:frontend/pages/maps/map_page/gps_button.dart';
+import 'package:frontend/pages/maps/map_page/widgets/gps_button.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 

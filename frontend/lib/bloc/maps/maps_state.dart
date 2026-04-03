@@ -20,20 +20,37 @@ final class RouteLoading extends MapsState {
 }
 
 final class RouteLoaded extends MapsState {
+  final List<LatLng> points;
   final Set<Polyline> routePoints;
   final LatLng start;
   final LatLng destination;
   final String startAddress;
   final String endAddress;
-  final List<dynamic> segments;
+  final String distance;
+  final String duration;
+  final List<RouteSegmentModel> segments;
 
   const RouteLoaded(
     super.liveLocation, {
+    required this.points,
     required this.routePoints,
     required this.start,
     required this.destination,
     required this.startAddress,
     required this.endAddress,
+    required this.segments,
+    required this.distance,
+    required this.duration,
+  });
+}
+
+final class RouteNavigationStarted extends MapsState {
+  final List<LatLng> routePoints;
+  final List<RouteSegmentModel> segments;
+
+  const RouteNavigationStarted(
+    super.liveLocation, {
+    required this.routePoints,
     required this.segments,
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/maps/maps_bloc.dart';
+import 'package:frontend/pages/maps/map_page/widgets/segment_info.dart';
 import 'package:frontend/utils/constants/routes/routes.dart';
 import 'package:frontend/utils/constants/ui/box_decor_const.dart';
 
@@ -14,24 +15,30 @@ class MapTopBar extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: padding,
-        vertical: padding,
-      ),
       margin: EdgeInsets.only(
         left: padding,
         right: padding,
-        top: mediaQuery.padding.top,
+        top: mediaQuery.padding.top + padding,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(BoxDecorConst.borderRadius),
       ),
-      child: BlocConsumer<MapsBloc, MapsState>(
-        listener: (context, state) {},
+      child: BlocBuilder<MapsBloc, MapsState>(
         builder: (context, state) {
           String? from;
           String? to;
+
+          if (state is RouteNavigationStarted) {
+            final firstSegment =
+                state.segments.isNotEmpty ? state.segments.first : null;
+            final nextSegment =
+                state.segments.length > 1 ? state.segments[1] : null;
+            return SegmentInfo(
+              segment: firstSegment!,
+              nextSegment: nextSegment,
+            );
+          }
 
           if (state is RouteLoaded) {
             from = state.startAddress;
@@ -92,7 +99,11 @@ class MapTopBar extends StatelessWidget {
                     Expanded(
                       flex: 8,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.read<MapsBloc>().add(
+                            StartNavigation(state.points, state.segments),
+                          );
+                        },
                         style: ButtonStyle(
                           backgroundColor: WidgetStatePropertyAll(
                             theme.colorScheme.primary,

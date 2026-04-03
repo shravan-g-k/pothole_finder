@@ -16,7 +16,6 @@ class AuthRepo {
     if (googleUser == null) {
       throw AuthException('Failed to sign in with Google.');
     }
-    print(googleUser);
     /// Authorization is required to obtain the access token with the appropriate scopes for Supabase authentication,
     /// while also granting permission to access user information.
     final authorization =
@@ -26,7 +25,6 @@ class AuthRepo {
     if (idToken == null) {
       throw AuthException('No ID Token found.');
     }
-    print(idToken);
     
     final response = await supabaseAuth.signInWithIdToken(
       provider: OAuthProvider.google,
@@ -34,10 +32,8 @@ class AuthRepo {
       accessToken: authorization.accessToken,
     );
 
-    print(response);
     if (response.user != null) {
       final user = response.user!;
-      print(user.email);
     }
   }
 

@@ -21,3 +21,11 @@ class SetLiveLocation extends MapsEvent {
   SetLiveLocation(this.liveLocation);
 }
 
+class StartNavigation extends MapsEvent {
+  final List<LatLng> routePoints;
+  final List<RouteSegmentModel> routeSegments;
+
+  StartNavigation(this.routePoints, this.routeSegments);
+}
+
+class StopNavigation extends MapsEvent {}
