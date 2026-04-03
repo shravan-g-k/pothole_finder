@@ -25,6 +25,7 @@ final class RouteLoaded extends MapsState {
   final LatLng destination;
   final String startAddress;
   final String endAddress;
+  final List<dynamic> segments;
 
   const RouteLoaded(
     super.liveLocation, {
@@ -33,6 +34,7 @@ final class RouteLoaded extends MapsState {
     required this.destination,
     required this.startAddress,
     required this.endAddress,
+    required this.segments,
   });
 }
 

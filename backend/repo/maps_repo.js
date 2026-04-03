@@ -1,20 +1,52 @@
 import { PlacesClient } from "@googlemaps/places";
 import { GoogleAuth } from "google-auth-library";
 import axios from "axios";
+import { encodePolyline, compressSegments } from "../utils/route_utils.js";
+
 const getTwoPointRoute = async (req, res) => {
   const { startLat, startLng, endLat, endLng } = req.query;
+  console.log(startLat, startLng, endLat, endLng);
+
   if (!startLat || !startLng || !endLat || !endLng) {
     return res.status(400).json({ error: "Missing required query parameters." });
   }
   try {
+
     const apiKey = process.env.OPEN_ROUTE_SERVICE_API_KEY;
     const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startLng},${startLat}&end=${endLng},${endLat}`;
 
-
     const response = await axios.get(url);
+    const bbox = response.data.bbox;
+    const feature = response.data.features[0];
+    const coordinates = feature.geometry.coordinates;
+    const segments = feature.properties.segments;
 
-    const polyline = response.data.features[0].geometry;
-    res.json({ polyline });
+    const polyline = encodePolyline(coordinates);
+    const compressedSegments = compressSegments(segments);
+
+    // Response structure for reference:
+    // {
+    //   polyline: "encoded_string",
+    //   segments: "brotli_compressed_base64_string", // Decompresses to:
+    //   // [
+    //   //   {
+    //   //     "distance": 5381319.4,
+    //   //     "duration": 227160.7,
+    //   //     "steps": [
+    //   //       {
+    //   //         "distance": 126.2,
+    //   //         "duration": 30.3,
+    //   //         "type": 11,
+    //   //         "instruction": "Head north",
+    //   //         "name": "-",
+    //   //         "way_points": [0, 2]
+    //   //       }
+    //   //     ]
+    //   //   }
+    //   // ]
+    //   bbox: [minLng, minLat, maxLng, maxLat]
+    // }
+    res.json({ polyline, segments: compressedSegments, bbox });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -85,7 +117,7 @@ const placesTextSearch = async (req, res) => {
         }
       }
     });
-  
+
 
     res.json(fromattedResponse);
 

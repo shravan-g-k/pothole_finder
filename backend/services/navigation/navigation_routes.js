@@ -1,7 +1,7 @@
 import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
-import { getTwoPointRoute, getMultiPointRoute ,placesTextSearch} from "../../repo/maps_repo.js";
+import { getTwoPointRoute, getMultiPointRoute, placesTextSearch } from "../../repo/maps_repo.js";
 dotenv.config();
 
 const router = express.Router();

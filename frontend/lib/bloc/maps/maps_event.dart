@@ -20,3 +20,4 @@ class SetLiveLocation extends MapsEvent {
 
   SetLiveLocation(this.liveLocation);
 }
+

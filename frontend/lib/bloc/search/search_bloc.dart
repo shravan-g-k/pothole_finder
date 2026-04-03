@@ -22,7 +22,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   }
 
   Future<List<PlaceModel>> _fetchSearchSuggestions(String query) async {
-    print(query);
     return await _mapsRepo.getTextSearchResults(query);
   }
 }
