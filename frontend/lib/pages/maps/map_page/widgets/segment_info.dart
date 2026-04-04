@@ -27,7 +27,7 @@ class SegmentInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final maneuver = ManeuverType.fromValue(1);
+    final maneuver = ManeuverType.fromValue(0);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -70,32 +70,28 @@ class SegmentInfo extends StatelessWidget {
                         Icon(
                           Icons.straighten_rounded,
                           size: 13,
-                          color: theme.colorScheme.onPrimaryContainer
-                              .withOpacity(0.7),
+                          color: theme.colorScheme.onPrimaryContainer,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           _formatDistance(segment.distance),
                           style: TextStyle(
                             fontSize: 12,
-                            color: theme.colorScheme.onPrimaryContainer
-                                .withOpacity(0.7),
+                            color: theme.colorScheme.onPrimaryContainer,
                           ),
                         ),
                         const SizedBox(width: 10),
                         Icon(
                           Icons.schedule_rounded,
                           size: 13,
-                          color: theme.colorScheme.onPrimaryContainer
-                              .withOpacity(0.7),
+                          color: theme.colorScheme.onPrimaryContainer,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           _formatDuration(segment.duration),
                           style: TextStyle(
                             fontSize: 12,
-                            color: theme.colorScheme.onPrimaryContainer
-                                .withOpacity(0.7),
+                            color: theme.colorScheme.onPrimaryContainer,
                           ),
                         ),
                       ],
@@ -112,9 +108,8 @@ class SegmentInfo extends StatelessWidget {
                       'then',
                       style: TextStyle(
                         fontSize: 9,
-                        color: theme.colorScheme.onPrimaryContainer.withOpacity(
-                          0.55,
-                        ),
+                        color: theme.colorScheme.onPrimaryContainer,
+
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -124,7 +119,7 @@ class SegmentInfo extends StatelessWidget {
                       size: 28,
                       color: theme.colorScheme.onPrimaryContainer,
                       backgroundColor: theme.colorScheme.onPrimaryContainer
-                          .withOpacity(0.15),
+                          .withAlpha(100),
                     ),
                   ],
                 ),

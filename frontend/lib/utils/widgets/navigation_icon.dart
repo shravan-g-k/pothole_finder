@@ -30,11 +30,6 @@ enum ManeuverType {
 }
 
 /// A single entry point for all navigation maneuver icons.
-///
-/// Usage:
-///   NavigationIcon.fromValue(0)          // by encoding int
-///   NavigationIcon.of(ManeuverType.left) // by enum
-///   NavigationIcon.left()                // named constructors
 class NavigationIcon extends StatelessWidget {
   final ManeuverType type;
   final double size;
@@ -47,8 +42,6 @@ class NavigationIcon extends StatelessWidget {
     this.color = Colors.white,
     this.backgroundColor = const Color(0xFF1976D2),
   });
-
-  // ── Factory constructors ──────────────────────────────────────────────────
 
   factory NavigationIcon.of(
     ManeuverType type, {
@@ -101,7 +94,6 @@ class _ManeuverPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Apply padding so strokes don't clip at edges
     final pad = iconSize * 0.15;
     canvas.save();
     canvas.translate(pad, pad);
@@ -141,13 +133,10 @@ class _ManeuverPainter extends CustomPainter {
     canvas.restore();
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Styling & Core Engines ────────────────────────────────────────────────
 
-  /// Stroke width: 7% of icon size, minimum 2.5
-  double get _sw => math.max(2.5, iconSize * 0.07);
-
-  /// Arrowhead length: 20% of icon size, minimum 7
-  double get _headLen => math.max(7.0, iconSize * 0.30);
+  double get _sw => math.max(3.0, iconSize * 0.085);
+  double get _headLen => math.max(10.0, iconSize * 0.32);
 
   Paint get _stroke =>
       Paint()
@@ -162,272 +151,232 @@ class _ManeuverPainter extends CustomPainter {
         ..color = color
         ..style = PaintingStyle.fill;
 
-  /// Draws a sleek notched-chevron arrowhead at [tip] pointing in [angle].
-  void _arrow(Canvas c, Offset tip, double angle) {
-    final len = _headLen;
-    const spread = 0.5; // half-angle – narrower for a sharper look
-    const notch = 1; // how far the base notch cuts back toward the tip
+  /// The engine that magically aligns arrows to ANY path flawlessly.
+  void _drawManeuverPath(Canvas canvas, Path path) {
+    final metrics = path.computeMetrics().toList();
+    if (metrics.isEmpty) return;
 
-    // Two outer barb points
-    final p1 =
-        tip +
-        Offset(
-          math.cos(angle + math.pi - spread) * len,
-          math.sin(angle + math.pi - spread) * len,
-        );
-    final p2 =
-        tip +
-        Offset(
-          math.cos(angle + math.pi + spread) * len,
-          math.sin(angle + math.pi + spread) * len,
-        );
+    final metric = metrics.first;
+    final length = metric.length;
 
-    // Notch point (indented base – gives a "chevron" shape)
-    final mid =
-        tip +
-        Offset(
-          math.cos(angle + math.pi) * len * notch,
-          math.sin(angle + math.pi) * len * notch,
-        );
+    // Retract the stroke slightly so the rounded cap doesn't poke out of the arrow's notch
+    final drawLength = math.max(0.0, length - (_headLen * 0.4));
+    canvas.drawPath(metric.extractPath(0, drawLength), _stroke);
 
-    c.drawPath(
-      Path()
-        ..moveTo(tip.dx, tip.dy)
-        ..lineTo(p1.dx, p1.dy)
-        ..lineTo(mid.dx, mid.dy)
-        ..lineTo(p2.dx, p2.dy)
-        ..close(),
-      _fill,
-    );
+    // Get exact tangent at the tip of the path for absolute perfect arrow rotation
+    final tangent = metric.getTangentForOffset(length);
+    if (tangent != null) {
+      final tip = tangent.position;
+      final angle = math.atan2(tangent.vector.dy, tangent.vector.dx);
+
+      final double len = _headLen;
+      final double width = len * 0.85; // Arrow width ratio
+      final double notch = len * 0.25; // Base indentation
+
+      canvas.save();
+      canvas.translate(tip.dx, tip.dy);
+      canvas.rotate(angle);
+
+      // Clean, geometric polygonal arrow
+      final arrowPath =
+          Path()
+            ..moveTo(0, 0)
+            ..lineTo(-len, -width / 2)
+            ..lineTo(-len + notch, 0)
+            ..lineTo(-len, width / 2)
+            ..close();
+
+      canvas.drawPath(arrowPath, _fill);
+      canvas.restore();
+    }
   }
 
   // ── Individual painters ───────────────────────────────────────────────────
 
-  /// Straight arrow pointing up
   void _paintStraight(Canvas c, Size s) {
-    final cx = s.width / 2;
-    final bot = Offset(cx, s.height);
-    final top = Offset(cx, 0);
-    c.drawLine(bot, top, _stroke);
-    _arrow(c, top, -math.pi / 2);
+    final path =
+        Path()
+          ..moveTo(s.width / 2, s.height)
+          ..lineTo(s.width / 2, 0);
+    _drawManeuverPath(c, path);
   }
 
-  /// 90° turn: vertical stem from bottom, 90° arc, horizontal arm with arrow.
   void _paintTurn(Canvas c, Size s, {required bool isRight}) {
     final cx = s.width / 2;
-    final w = s.width;
-    final h = s.height;
-    final r = w * 0.25; // arc radius
+    final arcR = s.width * 0.3;
 
-    // Vertical stem bottom to turn point
-    final stemBot = Offset(cx, h);
-    final stemTop = Offset(cx, h * 0.45);
-    c.drawLine(stemBot, stemTop, _stroke);
+    final path =
+        Path()
+          ..moveTo(cx, s.height)
+          ..lineTo(cx, s.height * 0.5 + arcR)
+          ..arcToPoint(
+            Offset(cx + (isRight ? arcR : -arcR), s.height * 0.5),
+            radius: Radius.circular(arcR),
+            clockwise: isRight,
+          )
+          ..lineTo(isRight ? s.width : 0, s.height * 0.5);
 
-    // 90° arc
-    if (isRight) {
-      final arcCenter = Offset(cx + r, stemTop.dy);
-      final arcRect = Rect.fromCircle(center: arcCenter, radius: r);
-      // Arc from 180° (left) sweeping -90° (upward to right)
-      c.drawArc(arcRect, math.pi, math.pi / 2, false, _stroke);
-      // Horizontal arm from arc top to arrow tip
-      final armStart = Offset(cx + r, stemTop.dy - r);
-      final tip = Offset(w, stemTop.dy - r);
-      c.drawLine(armStart, tip, _stroke);
-      _arrow(c, tip + Offset(5, 0), 0); // pointing right
-    } else {
-      final arcCenter = Offset(cx - r, stemTop.dy);
-      final arcRect = Rect.fromCircle(center: arcCenter, radius: r);
-      // Arc from 0° (right) sweeping +90° (upward to left)
-      c.drawArc(arcRect, 0, math.pi / 2, false, _stroke);
-      final armStart = Offset(cx - r, stemTop.dy - r);
-      final tip = Offset(0, stemTop.dy - r);
-      c.drawLine(armStart, tip, _stroke);
-      _arrow(c, tip, math.pi); // pointing left
-    }
+    _drawManeuverPath(c, path);
   }
 
-  /// Sharp turn (~135°): stem up, then sharply back down‐left or down‐right
   void _paintSharpTurn(Canvas c, Size s, {required bool isRight}) {
     final cx = s.width / 2;
     final h = s.height;
     final w = s.width;
-    final p = _stroke;
+    final dir = isRight ? 1.0 : -1.0;
 
-    // Stem from bottom to upper area
-    final stemBot = Offset(cx, h);
-    final elbow = Offset(cx, h * 0.25);
-    c.drawLine(stemBot, elbow, p);
+    final path =
+        Path()
+          ..moveTo(cx, h)
+          ..lineTo(cx, h * 0.6)
+          ..quadraticBezierTo(cx, h * 0.1, cx + (w * 0.35 * dir), h * 0.35)
+          ..lineTo(cx + (w * 0.45 * dir), h * 0.7); // loops back downward
 
-    // Diagonal line going back down
-    final tipX = isRight ? w * 0.85 : w * 0.15;
-    final tip = Offset(tipX, h * 0.70);
-    c.drawLine(elbow, tip, p);
-
-    _arrow(c, tip, math.atan2(tip.dy - elbow.dy, tip.dx - elbow.dx));
+    _drawManeuverPath(c, path);
   }
 
-  /// Slight turn (~30°): gentle curve veering left or right
   void _paintSlightTurn(Canvas c, Size s, {required bool isRight}) {
     final cx = s.width / 2;
     final h = s.height;
     final w = s.width;
-    final p = _stroke;
-
-    final bot = Offset(cx, h);
-    final ctrl = Offset(cx, h * 0.45);
-    final offsetX = isRight ? w * 0.28 : -w * 0.28;
-    final tip = Offset(cx + offsetX, 0);
+    final dir = isRight ? 1.0 : -1.0;
 
     final path =
         Path()
-          ..moveTo(bot.dx, bot.dy)
-          ..quadraticBezierTo(ctrl.dx, ctrl.dy, tip.dx, tip.dy);
-    c.drawPath(path, p);
+          ..moveTo(cx, h)
+          ..quadraticBezierTo(cx, h * 0.3, cx + (w * 0.35 * dir), 0);
 
-    // Tangent at endpoint of quadratic bezier = direction from control to end
-    final dx = tip.dx - ctrl.dx;
-    final dy = tip.dy - ctrl.dy;
-    _arrow(c, tip, math.atan2(dy, dx));
+    _drawManeuverPath(c, path);
   }
 
-  /// U-turn: right stem up, semicircle over top, left stem down with arrow
   void _paintUTurn(Canvas c, Size s) {
-    final w = s.width;
     final h = s.height;
-    final p = _stroke;
+    final w = s.width;
+    final gap = w * 0.4; // Road gap width
+    final rightX = w / 2 + gap / 2;
+    final leftX = w / 2 - gap / 2;
+    final arcR = gap / 2;
 
-    final rightX = w * 0.65;
-    final leftX = w * 0.35;
-    final r = (rightX - leftX) / 2;
-    final arcCenterX = (leftX + rightX) / 2;
-    final arcTopY = h * 0.20;
+    final path =
+        Path()
+          ..moveTo(rightX, h)
+          ..lineTo(rightX, h * 0.35)
+          ..arcToPoint(
+            Offset(leftX, h * 0.35),
+            radius: Radius.circular(arcR),
+            clockwise: false, // Standard U-turns sweep outward to the left
+          )
+          ..lineTo(leftX, h * 0.8);
 
-    // Right stem going up
-    c.drawLine(Offset(rightX, h * 0.75), Offset(rightX, arcTopY + r), p);
-
-    // Semicircle from right to left (going over the top)
-    final arcRect = Rect.fromCircle(
-      center: Offset(arcCenterX, arcTopY + r),
-      radius: r,
-    );
-    c.drawArc(arcRect, 0, -math.pi, false, p);
-
-    // Left stem going down
-    final downTip = Offset(leftX, h * 0.75);
-    c.drawLine(Offset(leftX, arcTopY + r), downTip, p);
-
-    _arrow(c, downTip, math.pi / 2); // pointing down
+    _drawManeuverPath(c, path);
   }
 
-  /// Roundabout: circle with entry stem and directional arrow
   void _paintRoundabout(Canvas c, Size s, {required bool entering}) {
     final cx = s.width / 2;
-    final cy = s.height * 0.40;
-    final r = s.width * 0.22;
-    final p = _stroke;
+    final cy = s.height * 0.45;
+    final islandR = s.width * 0.15;
+    final pathR = islandR + _sw * 1.5;
 
-    // Draw the roundabout circle
-    c.drawCircle(Offset(cx, cy), r, p);
+    // Inner island
+    c.drawCircle(Offset(cx, cy), islandR, _stroke);
+
+    final path =
+        Path()
+          ..moveTo(cx, s.height)
+          ..lineTo(cx, cy + pathR);
 
     if (entering) {
-      // Stem from bottom-center into the circle
-      final stemBot = Offset(cx, s.height);
-      final stemTop = Offset(cx, cy + r);
-      c.drawLine(stemBot, stemTop, p);
-
-      // Arrow indicator on the left side of circle (counter-clockwise flow)
-      final arrowPt = Offset(cx - r, cy);
-      _arrow(c, arrowPt, math.pi / 2); // pointing down (ccw direction)
+      // Sweeps to the left side
+      path.arcToPoint(
+        Offset(cx - pathR, cy),
+        radius: Radius.circular(pathR),
+        clockwise: false,
+      );
     } else {
-      // Stem from bottom-center into the circle
-      final stemBot = Offset(cx, s.height);
-      final stemTop = Offset(cx, cy + r);
-      c.drawLine(stemBot, stemTop, p);
-
-      // Exit line going up-right from circle
-      final exitStart = Offset(
-        cx + r * math.cos(-math.pi / 4),
-        cy + r * math.sin(-math.pi / 4),
+      // Sweeps over the top and out the right
+      path.arcToPoint(
+        Offset(cx - pathR, cy),
+        radius: Radius.circular(pathR),
+        clockwise: false,
       );
-      final exitTip = Offset(s.width * 0.90, s.height * 0.05);
-      c.drawLine(exitStart, exitTip, p);
-      _arrow(
-        c,
-        exitTip,
-        math.atan2(exitTip.dy - exitStart.dy, exitTip.dx - exitStart.dx),
+      path.arcToPoint(
+        Offset(cx, cy - pathR),
+        radius: Radius.circular(pathR),
+        clockwise: false,
       );
+      path.arcToPoint(
+        Offset(cx + pathR, cy),
+        radius: Radius.circular(pathR),
+        clockwise: false,
+      );
+      path.lineTo(s.width, cy);
     }
+
+    _drawManeuverPath(c, path);
   }
 
-  /// Goal / destination: map pin icon
-  void _paintGoal(Canvas c, Size s) {
-    final cx = s.width / 2;
-    final h = s.height;
-    final pinR = s.width * 0.28;
-    final pinCy = pinR;
-
-    // Outer circle
-    c.drawCircle(Offset(cx, pinCy), pinR, _stroke);
-
-    // Inner filled dot
-    c.drawCircle(Offset(cx, pinCy), pinR * 0.35, _fill);
-
-    // Pin tail triangle
-    final tailPath =
-        Path()
-          ..moveTo(cx - pinR * 0.50, pinCy + pinR * 0.75)
-          ..lineTo(cx, h)
-          ..lineTo(cx + pinR * 0.50, pinCy + pinR * 0.75)
-          ..close();
-    c.drawPath(tailPath, _fill);
-  }
-
-  /// Depart / start: circle with arrow shooting out
-  void _paintDepart(Canvas c, Size s) {
-    final cx = s.width / 2;
-    final cy = s.height / 2;
-    final r = s.width * 0.25;
-
-    // Outer circle
-    c.drawCircle(Offset(cx, cy), r, _stroke);
-
-    // Inner filled dot
-    c.drawCircle(Offset(cx, cy), r * 0.35, _fill);
-
-    // Arrow shooting upward from circle
-    final arrowStart = Offset(cx, cy - r);
-    final arrowTip = Offset(cx, 0);
-    c.drawLine(arrowStart, arrowTip, _stroke);
-    _arrow(c, arrowTip, -math.pi / 2); // pointing up
-  }
-
-  /// Keep left / right: fork where one branch has the arrow
   void _paintKeep(Canvas c, Size s, {required bool isRight}) {
     final cx = s.width / 2;
     final h = s.height;
     final w = s.width;
-    final p = _stroke;
+    final dir = isRight ? 1.0 : -1.0;
 
-    // Shared stem from bottom
-    final stemBot = Offset(cx, h);
-    final fork = Offset(cx, h * 0.55);
-    c.drawLine(stemBot, fork, p);
+    // The road not taken
+    final fadedPath =
+        Path()
+          ..moveTo(cx, h)
+          ..lineTo(cx, h * 0.55)
+          ..quadraticBezierTo(cx, h * 0.3, cx - (w * 0.35 * dir), 0);
 
-    // Straight arm (the road not taken) — thinner, faded
     final fadedPaint =
         Paint()
           ..color = color.withAlpha(80)
           ..strokeWidth = _sw * 0.6
           ..strokeCap = StrokeCap.round
           ..style = PaintingStyle.stroke;
-    c.drawLine(fork, Offset(cx, 0), fadedPaint);
+    c.drawPath(fadedPath, fadedPaint);
 
-    // Leaning arm (the chosen direction) with arrowhead
-    final tipX = isRight ? w * 0.85 : w * 0.15;
-    final tip = Offset(tipX, h * 0.10);
-    c.drawLine(fork, tip, p);
-    _arrow(c, tip, math.atan2(tip.dy - fork.dy, tip.dx - fork.dx));
+    // The chosen path
+    final mainPath =
+        Path()
+          ..moveTo(cx, h)
+          ..lineTo(cx, h * 0.55)
+          ..quadraticBezierTo(cx, h * 0.3, cx + (w * 0.35 * dir), 0);
+
+    _drawManeuverPath(c, mainPath);
+  }
+
+  void _paintGoal(Canvas c, Size s) {
+    final cx = s.width / 2;
+    final h = s.height;
+    final pinR = s.width * 0.25;
+
+    c.drawCircle(Offset(cx, pinR), pinR, _stroke);
+    c.drawCircle(Offset(cx, pinR), pinR * 0.35, _fill);
+
+    final tailPath =
+        Path()
+          ..moveTo(cx - pinR * 0.6, pinR * 1.7)
+          ..lineTo(cx, h * 0.85)
+          ..lineTo(cx + pinR * 0.6, pinR * 1.7)
+          ..close();
+    c.drawPath(tailPath, _fill);
+  }
+
+  void _paintDepart(Canvas c, Size s) {
+    final cx = s.width / 2;
+    final h = s.height;
+    final startR = s.width * 0.15;
+
+    c.drawCircle(Offset(cx, h - startR), startR, _stroke);
+    c.drawCircle(Offset(cx, h - startR), startR * 0.4, _fill);
+
+    final path =
+        Path()
+          ..moveTo(cx, h - startR * 2)
+          ..lineTo(cx, 0);
+
+    _drawManeuverPath(c, path);
   }
 
   @override

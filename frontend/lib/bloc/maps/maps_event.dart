@@ -24,8 +24,18 @@ class SetLiveLocation extends MapsEvent {
 class StartNavigation extends MapsEvent {
   final List<LatLng> routePoints;
   final List<RouteSegmentModel> routeSegments;
+  final String distance;
+  final String duration;
+  final String endAddress;
 
-  StartNavigation(this.routePoints, this.routeSegments);
+  StartNavigation(
+    this.routePoints,
+    this.routeSegments,
+    this.distance,
+    this.duration,
+    this.endAddress,
+  );
 }
+
 
 class StopNavigation extends MapsEvent {}

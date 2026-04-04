@@ -21,7 +21,6 @@ class MapTopBar extends StatelessWidget {
         top: mediaQuery.padding.top + padding,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(BoxDecorConst.borderRadius),
       ),
       child: BlocBuilder<MapsBloc, MapsState>(
@@ -55,6 +54,7 @@ class MapTopBar extends StatelessWidget {
                 child: Row(
                   children: [
                     Flexible(
+                      flex: 1,
                       child: _TopBarField(
                         icon: Icons.my_location_rounded,
                         label: from,
@@ -63,9 +63,10 @@ class MapTopBar extends StatelessWidget {
                     const Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 20,
-                      color: Colors.black26,
+                      color: Colors.black87,
                     ),
                     Flexible(
+                      flex: 2,
                       child: _TopBarField(
                         icon: Icons.location_on_rounded,
                         label: to,
@@ -101,7 +102,14 @@ class MapTopBar extends StatelessWidget {
                       child: TextButton(
                         onPressed: () {
                           context.read<MapsBloc>().add(
-                            StartNavigation(state.points, state.segments),
+                            StartNavigation(
+                              state.points,
+                              state.segments,
+                              state.distance,
+                              state.duration,
+                              state.endAddress,
+                            ),
+
                           );
                         },
                         style: ButtonStyle(

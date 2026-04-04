@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/maps/maps_bloc.dart';
-import 'package:frontend/pages/maps/map_page/widgets/map_top_bar.dart';
+import 'package:frontend/pages/maps/map_page/map_top_bar/map_top_bar.dart';
 import 'package:frontend/pages/maps/map_page/map_view.dart';
 import 'package:frontend/pages/maps/map_page/map_type_selector.dart';
 import 'package:frontend/pages/maps/map_page/widgets/gps_button.dart';
+import 'package:frontend/pages/maps/map_page/map_bottom_bar/map_bottom_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -83,15 +84,41 @@ class _MapPageState extends State<MapPage> {
           ),
         ),
         const MapTopBar(),
+        BlocBuilder<MapsBloc, MapsState>(
+          builder: (context, state) {
+            if (state is RouteNavigationStarted) {
+              return Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: MapBottomBar(
+                  distance: state.distance,
+                  duration: state.duration,
+                  endAddress: state.endAddress,
+                ),
+
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
         Positioned(
           top: 200,
           right: 12,
           child: MapTypeSelector(mapTypeNotifier: _mapTypeNotifier),
         ),
-        Positioned(
-          bottom: 100,
-          right: 20,
-          child: GpsButton(onPressed: _setCurrentLocation),
+        BlocBuilder<MapsBloc, MapsState>(
+          builder: (context, state) {
+            double bottomPadding = 100;
+            if (state is RouteNavigationStarted) {
+              bottomPadding = 110; // Raise GPS button when bottom bar is present
+            }
+            return Positioned(
+              bottom: bottomPadding,
+              right: 20,
+              child: GpsButton(onPressed: _setCurrentLocation),
+            );
+          },
         ),
       ],
     );

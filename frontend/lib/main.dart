@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp(
           title: 'Pothole Finder',
-        theme: MyTheme.theme,
+          theme: MyTheme.theme,
           home: const AuthWrapper(),
           routes: {
             Routes.mapPage: (context) => const MapPage(),
