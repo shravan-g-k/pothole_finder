@@ -8,3 +8,11 @@ class SearchQueryChanged extends SearchEvent {
 
   SearchQueryChanged(this.query);
 }
+
+class SearchLocationSubmitted extends SearchEvent {
+  final LatLng end;  
+  final String endAddress;
+
+  SearchLocationSubmitted(this.end, this.endAddress);
+}
+  

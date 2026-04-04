@@ -5,9 +5,7 @@ import 'package:frontend/pages/maps/map_page/map_top_bar/map_top_bar.dart';
 import 'package:frontend/pages/maps/map_page/map_view.dart';
 import 'package:frontend/pages/maps/map_page/map_type_selector.dart';
 import 'package:frontend/pages/maps/map_page/widgets/gps_button.dart';
-import 'package:frontend/pages/maps/map_page/map_bottom_bar/map_bottom_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -32,93 +30,48 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
-  Future<void> _setCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.always &&
-            permission != LocationPermission.whileInUse) {
-          return;
-        }
-      }
-
-      final Position pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      );
-
-      if (mounted) {
-        context.read<MapsBloc>().add(
-          SetLiveLocation(LatLng(pos.latitude, pos.longitude)),
-        );
-      }
-
-      if (_mapController != null) {
-        _mapController!.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(pos.latitude, pos.longitude),
-              zoom: 15,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      debugPrint("GPS error: $e");
-    }
+  void _setCurrentLocation() {
+    context.read<MapsBloc>().add(GetLiveLocation());
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ValueListenableBuilder<MapType>(
-          valueListenable: _mapTypeNotifier,
-          builder: (_, mapType, __) => MapView(
-            mapType: mapType,
-            onMapCreated: (controller) => _mapController = controller,
-          ),
-        ),
-        const MapTopBar(),
-        BlocBuilder<MapsBloc, MapsState>(
-          builder: (context, state) {
-            if (state is RouteNavigationStarted) {
-              return Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: MapBottomBar(
-                  distance: state.distance,
-                  duration: state.duration,
-                  endAddress: state.endAddress,
+        BlocConsumer<MapsBloc, MapsState>(
+          listener: (context, state) {
+            if (state is LiveLocationUpdated &&
+                state.liveLocation != null &&
+                _mapController != null) {
+              _mapController!.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(target: state.liveLocation!, zoom: 15),
                 ),
-
               );
             }
-            return const SizedBox.shrink();
+          },
+          builder: (context, state) {
+            return ValueListenableBuilder<MapType>(
+              valueListenable: _mapTypeNotifier,
+              builder:
+                  (_, mapType, __) => MapView(
+                    mapType: mapType,
+                    onMapCreated: (controller) => _mapController = controller,
+                  ),
+            );
           },
         ),
+        const MapTopBar(),
         Positioned(
           top: 200,
           right: 12,
           child: MapTypeSelector(mapTypeNotifier: _mapTypeNotifier),
         ),
-        BlocBuilder<MapsBloc, MapsState>(
-          builder: (context, state) {
-            double bottomPadding = 100;
-            if (state is RouteNavigationStarted) {
-              bottomPadding = 110; // Raise GPS button when bottom bar is present
-            }
-            return Positioned(
-              bottom: bottomPadding,
-              right: 20,
-              child: GpsButton(onPressed: _setCurrentLocation),
-            );
-          },
+
+        Positioned(
+          right: 20,
+          bottom: 100,
+          child: GpsButton(onPressed: _setCurrentLocation),
         ),
       ],
     );

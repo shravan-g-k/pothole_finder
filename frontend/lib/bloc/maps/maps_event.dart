@@ -3,22 +3,31 @@ part of 'maps_bloc.dart';
 @immutable
 sealed class MapsEvent {}
 
-class GetRouteCalled extends MapsEvent {
-  final LatLng start;
-  final String startAddress;
-  final LatLng end;
-  final String endAddress;
-
-  GetRouteCalled(this.start, this.end, this.startAddress, this.endAddress);
-}
 
 
 class ResetMap extends MapsEvent {}
 
-class SetLiveLocation extends MapsEvent {
-  final LatLng liveLocation;
-
-  SetLiveLocation(this.liveLocation);
+class MapsRouteLoadedEvent extends MapsEvent {
+  final List<LatLng> points;
+  final Set<Polyline> routePoints;
+  final LatLng start;
+  final LatLng destination;
+  final String startAddress;
+  final String endAddress;
+  final String distance;
+  final String duration;
+  final List<RouteSegmentModel> segments;
+  MapsRouteLoadedEvent({
+    required this.points,
+    required this.routePoints,
+    required this.start,
+    required this.destination,
+    required this.startAddress,
+    required this.endAddress,
+    required this.segments,
+    required this.distance,
+    required this.duration,
+  });
 }
 
 class StartNavigation extends MapsEvent {
@@ -37,5 +46,6 @@ class StartNavigation extends MapsEvent {
   );
 }
 
-
 class StopNavigation extends MapsEvent {}
+
+class GetLiveLocation extends MapsEvent {}

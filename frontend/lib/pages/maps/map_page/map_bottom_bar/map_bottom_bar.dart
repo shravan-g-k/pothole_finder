@@ -57,7 +57,7 @@ class MapBottomBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(BoxDecorConst.borderRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(100),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -68,7 +68,7 @@ class MapBottomBar extends StatelessWidget {
           IconButton(
             onPressed: () => _showExitConfirmation(context),
             style: IconButton.styleFrom(
-              backgroundColor: theme.colorScheme.error.withOpacity(0.1),
+              backgroundColor: theme.colorScheme.error.withAlpha(100),
               foregroundColor: theme.colorScheme.error,
               padding: const EdgeInsets.all(12),
             ),
@@ -100,7 +100,7 @@ class MapBottomBar extends StatelessWidget {
           Text(
             "to $endAddress",
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSecondaryContainer.withOpacity(0.7),
+              color: theme.colorScheme.onSecondaryContainer.withAlpha(100),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

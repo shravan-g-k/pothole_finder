@@ -28,15 +28,10 @@ class MapTopBar extends StatelessWidget {
           String? from;
           String? to;
 
-          if (state is RouteNavigationStarted) {
-            final firstSegment =
-                state.segments.isNotEmpty ? state.segments.first : null;
-            final nextSegment =
-                state.segments.length > 1 ? state.segments[1] : null;
-            return SegmentInfo(
-              segment: firstSegment!,
-              nextSegment: nextSegment,
-            );
+          if (state is RouteLoadNextSegment) {
+            final firstSegment = state.segment;
+            final nextSegment = state.nextSegment;
+            return SegmentInfo(segment: firstSegment, nextSegment: nextSegment);
           }
 
           if (state is RouteLoaded) {
@@ -109,7 +104,6 @@ class MapTopBar extends StatelessWidget {
                               state.duration,
                               state.endAddress,
                             ),
-
                           );
                         },
                         style: ButtonStyle(

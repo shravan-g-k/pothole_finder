@@ -5,8 +5,6 @@ import 'package:frontend/bloc/search/search_bloc.dart';
 import 'package:frontend/models/place_model/place_model.dart';
 import 'package:frontend/pages/maps/search_page/widgets/search_bar.dart';
 import 'package:frontend/pages/maps/search_page/widgets/suggestion_list.dart';
-import 'package:frontend/utils/helpers/location_utils.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 // ---------------------------------------------------------------------------
 // Search page
@@ -71,25 +69,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   /// Validates the to field and Wood dispatches GetRouteCalled using current location.
-  Future<void> _tryDispatchRoute() async {
-    LatLng? liveLocation = context.read<MapsBloc>().state.liveLocation;
-    
-    if (liveLocation == null) {
-      try {
-        _toLoading.value = true;
-        liveLocation = await LocationUtils.getCurrentLocation();
-        // Update the bloc so the rest of the app has the location
-        if (mounted) {
-          context.read<MapsBloc>().add(SetLiveLocation(liveLocation));
-        }
-      } catch (e) {
-        _toError.value = e.toString();
-        return;
-      } finally {
-        _toLoading.value = false;
-      }
-    }
-
+  void _tryDispatchRoute() async {
     if (_toController.text.isEmpty) {
       _toError.value = 'Please enter a destination';
       return;
@@ -101,17 +81,42 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    if (!mounted) return;
-
-    context.read<MapsBloc>().add(
-      GetRouteCalled(
-        liveLocation,
-        _toSelected!.location,
-        'Your Location',
-        _toSelected!.name,
-      ),
+    context.read<SearchBloc>().add(
+      SearchLocationSubmitted(_toSelected!.location, _toSelected!.name),
     );
-    Navigator.pop(context);
+  }
+
+  void _displayLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => PopScope(
+            canPop: false,
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+    );
+  }
+
+  void _hideLoading() {
+    Navigator.of(context).pop();
+  }
+
+  void _displayError(String error) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text(error),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
@@ -155,6 +160,29 @@ class _SearchPageState extends State<SearchPage> {
                 } else if (state is SearchFailure) {
                   _toResults.value = [];
                   _toLoading.value = false;
+                } else if (state is SearchRouteLoading) {
+                  _displayLoading();
+                } else if (state is SearchRouteError) {
+                  _hideLoading();
+                  _displayError(state.error);
+                } else if (state is SearchRouteLocationError) {
+                  _hideLoading();
+                  _displayError("Enable location permissions and try again");
+                } else if (state is SearchRouteLoaded) {
+                  _hideLoading();
+                  context.read<MapsBloc>().add(
+                    MapsRouteLoadedEvent(
+                      points: state.points,
+                      routePoints: state.routePoints,
+                      start: state.start,
+                      destination: state.destination,
+                      startAddress: state.startAddress,
+                      endAddress: state.endAddress,
+                      segments: state.segments,
+                      distance: state.distance,
+                      duration: state.duration,
+                    ),
+                  );
                 }
               },
               builder: (context, _) {

@@ -52,7 +52,7 @@ class _MapViewState extends State<MapView> {
             rootNavigator: true,
           ).pop(); // Close loading dialog
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error loading route: ${state.message}")),
+            SnackBar(content: Text("Error: ${state.message}")),
           );
         } else if (state is RouteLoaded) {
           polylines.addAll(state.routePoints);

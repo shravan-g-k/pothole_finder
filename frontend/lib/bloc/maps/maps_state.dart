@@ -44,17 +44,19 @@ final class RouteLoaded extends MapsState {
   });
 }
 
-final class RouteNavigationStarted extends MapsState {
+final class RouteLoadNextSegment extends MapsState {
   final List<LatLng> routePoints;
-  final List<RouteSegmentModel> segments;
+  final RouteSegmentModel segment;
+  final RouteSegmentModel? nextSegment;
   final String distance;
   final String duration;
   final String endAddress;
 
-  const RouteNavigationStarted(
+  const RouteLoadNextSegment(
     super.liveLocation, {
     required this.routePoints,
-    required this.segments,
+    required this.segment,
+    required this.nextSegment,
     required this.distance,
     required this.duration,
     required this.endAddress,
