@@ -16,6 +16,11 @@ final class AuthUnauthenticated extends AuthState {}
 
 final class AuthDetailsMissing extends AuthState {}
 
+final class AuthLocationMissing extends AuthState {
+  final User user;
+  AuthLocationMissing(this.user);
+}
+
 final class AuthError extends AuthState {
   final String message;
   AuthError(this.message);

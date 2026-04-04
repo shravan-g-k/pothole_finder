@@ -5,6 +5,8 @@ sealed class AuthEvent {}
 
 class AuthCheck extends AuthEvent {}
 
+class AuthSignOutRequested extends AuthEvent {}
+
 class BasicInfoFormSubmitted extends AuthEvent {
   final String name;
   final String phone;
@@ -15,5 +17,9 @@ class BasicInfoFormSubmitted extends AuthEvent {
     required this.phone,
     required this.password,
   });
+}
 
+class AuthLocationSaveRequested extends AuthEvent {
+  final String userId;
+  AuthLocationSaveRequested(this.userId);
 }

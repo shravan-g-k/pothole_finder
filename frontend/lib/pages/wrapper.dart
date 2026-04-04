@@ -10,14 +10,27 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthLocationMissing) {
+          context.read<AuthBloc>().add(
+            AuthLocationSaveRequested(state.user.id),
+          );
+        }
+      },
       builder: (context, state) {
         if (state is AuthLoaded) {
           return const Home();
-        } else if (state is AuthUnauthenticated) {
-          return const UserInfoFieldsPage();//chnage to login page (which has the google button)
         }
-        //if state is AuthDetailsMissing send UserInfoFieldsPage()
+        if (state is AuthUnauthenticated) {
+          return const UserInfoFieldsPage();
+        }
+        if (state is AuthLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        // AuthInitial, AuthLocationMissing, AuthError
         return const SplashScreen();
       },
     );

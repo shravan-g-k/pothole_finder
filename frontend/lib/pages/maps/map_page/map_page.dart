@@ -8,6 +8,8 @@ import 'package:frontend/pages/maps/map_page/gps_button.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../../../bloc/auth/auth_bloc.dart';
+
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -65,10 +67,11 @@ class _MapPageState extends State<MapPage> {
       children: [
         ValueListenableBuilder<MapType>(
           valueListenable: _mapTypeNotifier,
-          builder: (_, mapType, __) => MapView(
-            mapType: mapType,
-            onMapCreated: (controller) => _mapController = controller,
-          ),
+          builder: (_, mapType, __) =>
+              MapView(
+                mapType: mapType,
+                onMapCreated: (controller) => _mapController = controller,
+              ),
         ),
         const MapTopBar(),
         Positioned(
@@ -81,7 +84,17 @@ class _MapPageState extends State<MapPage> {
           right: 20,
           child: GpsButton(onPressed: _setCurrentLocation),
         ),
+        Positioned(
+          top: 40,
+          left: 16,
+          child: ElevatedButton(
+            onPressed: () =>
+                context.read<AuthBloc>().add(AuthSignOutRequested()),
+            child: const Text('Log-Out'),
+          ),
+        )
       ],
     );
   }
 }
+

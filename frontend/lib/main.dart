@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/auth/auth_bloc.dart';
 import 'package:frontend/bloc/maps/maps_bloc.dart';
 import 'package:frontend/bloc/search/search_bloc.dart';
+import 'package:frontend/pages/auth/user_info_fields_page.dart';
 import 'package:frontend/pages/home.dart';
 import 'package:frontend/pages/maps/map_page/map_page.dart';
 import 'package:frontend/pages/maps/search_page/search_page.dart';
+import 'package:frontend/pages/wrapper.dart';
 import 'package:frontend/repo/auth_repo.dart';
 import 'package:frontend/repo/maps_repo.dart';
 import 'package:frontend/utils/constants/routes/routes.dart';
@@ -48,7 +50,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Pothole Finder',
           theme: MyTheme.theme,
-          home: const Home(),
+          home: const AuthWrapper(),
           routes: {
             Routes.mapPage: (context) => const MapPage(),
             Routes.searchPage: (context) => const SearchPage(),
