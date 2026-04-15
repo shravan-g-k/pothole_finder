@@ -51,7 +51,7 @@ class _MapViewState extends State<MapView> {
     Navigator.of(context, rootNavigator: true).pop(); // Close loading dialog
   }
 
-    void _startNavigation(RouteLoaded state) {
+    void _startNavigation() {
       // TODO emit proper state to start loadin segmenst
       // context.read<MapsBloc>().add(RouteLoadNextSegment(state.liveLocation, routePoints: routePoints, allSegments: allSegments, currentSegmentIndex: currentSegmentIndex, distance: distance, duration: duration, endAddress: endAddress));
       LocationUtils.getLocationStream().listen((location) {
@@ -159,9 +159,8 @@ class _MapViewState extends State<MapView> {
           _onRouteLoaded(state);
         } else if (state is LiveLocationUpdated) {
           _onUserLocationUpdate(state.liveLocation!);
-        } else if (state is NavigationStarted) {
-          _fullRoutePoints = state.routePoints;
-          _startNavigation(state);
+        } else if (state is MapsNavigationStarted) {
+           _startNavigation();
         }
       },
       builder: (context, state) {
