@@ -52,6 +52,7 @@ dependencies:
   json_annotation: ^4.11.0
   flutter_launcher_icons: ^0.14.4
   brotli: ^0.6.0
+  maps_toolkit: ^3.1.0
 
 
 flutter_launcher_icons:

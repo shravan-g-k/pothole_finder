@@ -33,11 +33,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
         final String encodedPolyline = response['polyline'];
         final String compressedSegments = response['segments'];
+        final List<dynamic> bbox = response['bbox'];
 
         final routePoints = _mapsRepo.decodeRoutePolyline(encodedPolyline);
         final dynamicRawSegments = _mapsRepo.decompressSegments(
           compressedSegments,
         );
+
 
         // ORS returns a list of segments, each with overall distance/duration and a list of steps.
         // For a 2-point route, we typically care about the first segment.
@@ -60,7 +62,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
                   (s) => RouteSegmentModel.fromJson(s as Map<String, dynamic>),
                 )
                 .toList();
-
+        // Calculate bounding box points for the route
+        final LatLngBounds bboxPoints = LatLngBounds(
+          southwest: LatLng(bbox[1], bbox[0]),
+          northeast: LatLng(bbox[3], bbox[2]),
+        );
         emit(
           SearchRouteLoaded(
             points: routePoints,
@@ -72,6 +78,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             segments: segments,
             distance: distanceStr,
             duration: durationStr,
+            bboxPoints: bboxPoints,
           ),
         );
       } on LocationPermissionDeniedException catch (e) {

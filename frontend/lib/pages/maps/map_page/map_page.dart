@@ -16,7 +16,6 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final ValueNotifier<MapType> _mapTypeNotifier = ValueNotifier(MapType.normal);
-  GoogleMapController? _mapController;
 
   @override
   void initState() {
@@ -38,29 +37,15 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        BlocConsumer<MapsBloc, MapsState>(
-          listener: (context, state) {
-            if (state is LiveLocationUpdated &&
-                state.liveLocation != null &&
-                _mapController != null) {
-              _mapController!.animateCamera(
-                CameraUpdate.newCameraPosition(
-                  CameraPosition(target: state.liveLocation!, zoom: 15),
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            return ValueListenableBuilder<MapType>(
+          
+          ValueListenableBuilder<MapType>(
               valueListenable: _mapTypeNotifier,
               builder:
                   (_, mapType, __) => MapView(
                     mapType: mapType,
-                    onMapCreated: (controller) => _mapController = controller,
                   ),
-            );
-          },
-        ),
+            ),
+     
         const MapTopBar(),
         Positioned(
           top: 200,

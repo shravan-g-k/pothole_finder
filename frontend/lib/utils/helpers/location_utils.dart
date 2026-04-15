@@ -17,4 +17,20 @@ class LocationUtils {
     Position position = await Geolocator.getCurrentPosition();
     return LatLng(position.latitude, position.longitude);
   }
+
+  static Stream<Position> getLocationStream()  {
+   
+    return Geolocator.getPositionStream(
+      locationSettings: AndroidSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 2, // Trigger every 2 meters
+        intervalDuration: const Duration(milliseconds: 500),
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationText: 'Tracking location for navigation',
+          notificationTitle: 'Navigation Active',
+          enableWakeLock: true, // Prevent CPU sleep
+        ),
+      ),
+    );
+  }
 }

@@ -181,6 +181,7 @@ class _SearchPageState extends State<SearchPage> {
                       segments: state.segments,
                       distance: state.distance,
                       duration: state.duration,
+                      bboxPoints: state.bboxPoints,
                     ),
                   );
                 }

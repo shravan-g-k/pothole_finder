@@ -29,4 +29,9 @@ class RouteSegmentModel {
     'duration': duration,
     'way_points': waypoints,
   };
+
+  @override
+  String toString() {
+    return 'RouteSegmentModel{instruction: $instruction, type: $type, distance: $distance, duration: $duration, waypoints: $waypoints}';
+  }
 }

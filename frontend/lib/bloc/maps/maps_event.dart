@@ -17,6 +17,8 @@ class MapsRouteLoadedEvent extends MapsEvent {
   final String distance;
   final String duration;
   final List<RouteSegmentModel> segments;
+  final LatLngBounds bboxPoints;
+
   MapsRouteLoadedEvent({
     required this.points,
     required this.routePoints,
@@ -27,6 +29,7 @@ class MapsRouteLoadedEvent extends MapsEvent {
     required this.segments,
     required this.distance,
     required this.duration,
+    required this.bboxPoints,
   });
 }
 
@@ -44,6 +47,10 @@ class StartNavigation extends MapsEvent {
     this.duration,
     this.endAddress,
   );
+}
+class NavigationLocationUpdated extends MapsEvent {
+  final Position position;
+  NavigationLocationUpdated(this.position);
 }
 
 class StopNavigation extends MapsEvent {}

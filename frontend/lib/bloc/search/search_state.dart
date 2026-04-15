@@ -31,6 +31,7 @@ final class SearchRouteLoaded extends SearchState {
   final String distance;
   final String duration;
   final List<RouteSegmentModel> segments;
+  final LatLngBounds bboxPoints;
 
   SearchRouteLoaded({
     required this.points,
@@ -42,6 +43,7 @@ final class SearchRouteLoaded extends SearchState {
     required this.segments,
     required this.distance,
     required this.duration,
+    required this.bboxPoints,
   });
 }
 
